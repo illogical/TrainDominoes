@@ -27,10 +27,10 @@ public class GameManager : MonoBehaviour
         playerDominoCenter = GetPlayerCenter() - new Vector3(0, DistanceFromCenter, 0);
 
         // TODO: create 3 dominoes- one for each player and a third that only the host knows about
-        var sampleDomino = Instantiate(Domino, playerDominoCenter, playerCamera.transform.rotation * dominoRotation);
-        sampleDomino.TopScore = 1;
-        sampleDomino.BottomScore = 2;
-        sampleDomino.UpdateDominoLabels();
+        //var sampleDomino = Instantiate(Domino, playerDominoCenter, playerCamera.transform.rotation * dominoRotation);
+        //sampleDomino.TopScore = 1;
+        //sampleDomino.BottomScore = 2;
+        //sampleDomino.UpdateDominoLabels();
     }
 
     void Update()

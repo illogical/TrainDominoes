@@ -777,6 +777,7 @@ MonoBehaviour:
   spawnPrefabs:
   - {fileID: 3325560248140386328, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
   - {fileID: 7874255730912142062, guid: dbe721723cd045945bd0b8a74d6b6636, type: 3}
+  - {fileID: 9168897387732639069, guid: 0d248f00a7ea82843a6cb418673dcb03, type: 3}
   dominoPrefab: {fileID: 3325560248140386328, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
   gameOverHandler: {fileID: 1373576781949793192, guid: dbe721723cd045945bd0b8a74d6b6636, type: 3}
   IsGameInProgress: 0

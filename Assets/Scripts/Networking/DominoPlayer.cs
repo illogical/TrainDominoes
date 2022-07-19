@@ -99,6 +99,7 @@ public class DominoPlayer : NetworkBehaviour
         // TODO: execute CmdDealDomino() when the turn begins for this player
         var newDomino = ((MyNetworkManager)NetworkManager.singleton).GetNextDomino();        
         NetworkServer.Spawn(newDomino, connectionToClient);
+
         RpcShowDominoes(newDomino);
     }
 
@@ -111,11 +112,10 @@ public class DominoPlayer : NetworkBehaviour
         if (hasAuthority)
         {
             var mover = domino.GetComponent<Mover>();
-
             domino.transform.position = new Vector3(0, 0, 0);
 
             // animate the movement for the current player
-            StartCoroutine(mover.MoveOverSeconds(playerBottomCenter, 2, 0));
+            StartCoroutine(mover.MoveOverSeconds(playerBottomCenter, 0.5f, 0));
         }
         else
         {

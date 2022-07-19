@@ -33,19 +33,6 @@ public class MyNetworkManager : NetworkManager
         return allDominoes[nextIndex];
     }
 
-    public void CreateDominoes()
-    {
-        // create sample dominoes on each client
-        for (int i = 0; i < 2; i++)
-        {
-            GameObject dominoInstance = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
-            var dominoEntity = dominoInstance.GetComponent<DominoEntity>();
-            dominoEntity.TopScore = i;
-            dominoEntity.BottomScore = i;
-            dominoEntity.UpdateDominoLabels();
-            allDominoes.Add(dominoInstance);
-        }
-    }
 
     #region Server
 
@@ -57,15 +44,6 @@ public class MyNetworkManager : NetworkManager
         Players.Add(player);
 
         player.SetDisplayName($"Player {Players.Count}");
-
-        //player.SetTeamColor(
-        //    new Color(
-        //        UnityEngine.Random.Range(0f, 1f),
-        //        UnityEngine.Random.Range(0f, 1f),
-        //        UnityEngine.Random.Range(0f, 1f)
-        //        )
-        //    );
-
         player.SetPartyOwner(Players.Count == 1);
     }
 
@@ -99,20 +77,25 @@ public class MyNetworkManager : NetworkManager
 
             NetworkServer.Spawn(gameOverHandlerInstance.gameObject);
 
-            int count = 1;
+            CreateDominoes();
+
             foreach (DominoPlayer player in Players)
             {
-                // create the domino based upon an available domino on the server/host
-                //GameObject dominoInstance = Instantiate(dominoPrefab, GetStartPosition().position, Quaternion.identity);
-                GameObject dominoInstance = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
-                var dominoEntity = dominoInstance.GetComponent<DominoEntity>();
-                dominoEntity.TopScore = count;
-                dominoEntity.BottomScore = count;
-                allDominoes.Add(dominoInstance);
-                player.AddPlayerDomino(dominoInstance);
-                count++;
+                // TODO: Need to loop through players before starting? Start an event?
             }
+        }
+    }
 
+    [Server]
+    public void CreateDominoes()    // TODO: move CreateDominoes to GameSession
+    {
+        for (int i = 0; i < 2; i++)
+        {
+            GameObject dominoInstance = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
+            var dominoEntity = dominoInstance.GetComponent<DominoEntity>();
+            dominoEntity.TopScore = i + 1;
+            dominoEntity.BottomScore = i + 1;
+            allDominoes.Add(dominoInstance);
         }
     }
 

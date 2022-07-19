@@ -25,8 +25,9 @@ namespace Assets.Scripts.Game
 
         public GameObject TrackPositions; // used to parent all other tracks to
 
-        //private Dictionary<int, GameObject> playerDominoes;
+        private Dictionary<int, GameObject> playerDominoes;
         private Dictionary<int, GameObject> tableDominoes = new Dictionary<int, GameObject>();  // TODO: need a wrapper for tracking each domino's direction on the table, and its parent/child domino relationship. Part of TableManager class?
+
 
         private GameObject selectedPlayerDomino;
         private bool allowClick = true;
@@ -152,9 +153,11 @@ namespace Assets.Scripts.Game
 
         public void CreateMesh(DominoEntity domino)
         {
-            domino.Mesh = Instantiate(DominoMesh, DominoMesh.transform.position, DominoMesh.transform.rotation, Player);
-            domino.Mesh.name = domino.ID.ToString();
-            SetDominoLabels(domino);
+            domino.UpdateDominoLabels();
+            var newMesh = Instantiate(DominoMesh, DominoMesh.transform.position, DominoMesh.transform.rotation, Player);
+            // TODO: check if this one already exists? Change this method to GetOrCreateMesh()
+            newMesh.name = domino.ID.ToString();
+            playerDominoes.Add(domino.ID, newMesh);
         }
 
         public void CreateMeshes(List<DominoEntity> dominoes)
@@ -165,34 +168,20 @@ namespace Assets.Scripts.Game
             }
         }        
 
-        public void SetDominoLabels(DominoEntity domino)
-        {
-            //string labelText = $"{domino.TopScore} / {domino.BottomScore}";
-            var labels = domino.Mesh.GetComponentsInChildren<TextMeshPro>();
 
-            if (domino.IsFlipped)
-            {
-                labels[1].SetText(domino.BottomScore.ToString());
-                labels[2].SetText(domino.TopScore.ToString());
-                return;
-            }
-
-            labels[1].SetText(domino.TopScore.ToString());
-            labels[2].SetText(domino.BottomScore.ToString());
-        }       
-
-        private void removeMesh(DominoEntity domino)
-        {
-            Destroy(domino.Mesh);
-            domino.Mesh = null;
-        }
+        // TODO: no need to delete any meshes. Will store meshes in an array. May need to manage the Active flags on all of them
+        //private void removeMesh(DominoEntity domino)
+        //{
+        //    Destroy(domino.Mesh);
+        //    domino.Mesh = null;
+        //}
         
 
         public void AlignPlayerDominoes(List<DominoEntity> dominoes)
         {
             // Vector3 relativePosition = objectA.transform.InverseTransformPoint(objectB.transform.position); // example of finding relative distance between objects
             var dominoCount = dominoes.Count;
-            var renderer = dominoes[0].Mesh.GetComponent<Renderer>(); // use any domino?
+            var renderer = dominoes[0].GetComponent<Renderer>(); // use any domino?
             float width = renderer.bounds.size.x;
             float margin = width / 4;
             float totalWidth = dominoCount * margin + dominoCount * width;
@@ -202,7 +191,9 @@ namespace Assets.Scripts.Game
             {
                 float evenOffset = dominoCount % 2 == 0 ? (width / 2) + (margin / 2) : 0;
                 float xPos = (i * (width + margin)) - xOffset + evenOffset;
-                dominoes[i].Mesh.transform.position = new Vector3(xPos, 0, 0) + PlayerDistanceFromCamera; // DistanceFromCamera provides the y and z
+                // TODO: Need to fix the position updating in AlignPlayerDominoes()
+                throw new NotImplementedException("Need to fix the position updating in AlignPlayerDominoes()");
+                //dominoes[i].Mesh.transform.position = new Vector3(xPos, 0, 0) + PlayerDistanceFromCamera; // DistanceFromCamera provides the y and z
             }
         }
 
@@ -213,7 +204,7 @@ namespace Assets.Scripts.Game
 
         //    for (int i = 0; i < dominoes.Count; i++)
         //    {
-                
+
         //        //AlignTrackEmpty(trackStartPosition);    // TODO: maybe parent domino to the empty?
 
         //        RotateDominoAddedToTrack(dominoes[i].Mesh.transform, new Vector3(0, 90, 90));
@@ -223,14 +214,17 @@ namespace Assets.Scripts.Game
         //    }
         //}
 
+        // TODO: Fix AlignDominoToTrack() (need to manage a single list of all the domino meshes)
         public void AlignDominoToTrack(DominoEntity domino, int dominoCount, int trackIndex)
         {            
-            var renderer = domino.Mesh.GetComponent<Renderer>();
+            // var renderer = domino.Mesh.GetComponent<Renderer>();
         
             //RotateDominoAddedToTrack(domino.Mesh.transform, new Vector3(0, 90, 90));
             //MovePlayerDominoToTrack(domino.Mesh, GetTrackPostion(dominoCount, trackIndex, renderer.bounds.size));
         }
 
+        // TODO: Fix AlignEngine() (need to manage a single list of all the domino meshes)
+        /*
         public void AlignEngine(DominoEntity domino) // TODO: pass in track as Dictionary<int, DominoEntity> when ready to add more tracks
         {            
             var renderer = domino.Mesh.GetComponent<Renderer>();
@@ -245,6 +239,7 @@ namespace Assets.Scripts.Game
             domino.Mesh.transform.Rotate(new Vector3(0, -90, 0));
             domino.Mesh.transform.position = new Vector3(xOffset, 0, 0) + linePos;
         }
+        */
 
         public void AddDominoToTrack(DominoEntity domino)
         {

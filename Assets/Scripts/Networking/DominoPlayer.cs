@@ -11,7 +11,7 @@ public class DominoPlayer : NetworkBehaviour
     private bool isPartyOwner = false;
     [SyncVar(hook = nameof(ClientHandleDisplayNameUpdated))]
     private string displayName;
-    [SerializeField] private List<DominoEntity> myUnits = new List<DominoEntity>(); // TODO: Not sure if DominoEntity needs to be a NetworkBehviour
+    [SerializeField] private List<GameObject> myDominoes = new List<GameObject>(); // TODO: Not sure if DominoEntity needs to be a NetworkBehviour
 
     public static event Action ClientOnInfoUpdated;
     public static event Action<bool> AuthorityOnPartyOwnerStateUpdated;
@@ -19,6 +19,15 @@ public class DominoPlayer : NetworkBehaviour
 
     public bool GetIsPartyOwner() => isPartyOwner;
     public string GetDisplayName() => displayName;
+
+    // TODO: Move this logic elsewhere
+    private Vector3 playerTopCenter = new Vector3(0, 1.07f, -9.87f);
+    private Vector3 playerBottomCenter = new Vector3(0, 0.93f, -9.87f);
+
+    public void AddPlayerDomino(GameObject domino)
+    {
+        myDominoes.Add(domino);
+    }
 
     #region Server
 
@@ -52,11 +61,6 @@ public class DominoPlayer : NetworkBehaviour
 
     #region Client
 
-    public override void OnStartAuthority()
-    {
-        //if (NetworkServer.active) { return; }
-    }
-
     public override void OnStartClient()
     {
         if (NetworkServer.active) { return; }
@@ -87,6 +91,36 @@ public class DominoPlayer : NetworkBehaviour
     private void ClientHandleDisplayNameUpdated(string oldName, string newName)
     {
         ClientOnInfoUpdated?.Invoke();
+    }
+
+    [Command]
+    public void CmdDealDomino()
+    {
+        // TODO: execute CmdDealDomino() when the turn begins for this player
+        var newDomino = ((MyNetworkManager)NetworkManager.singleton).GetNextDomino();        
+        NetworkServer.Spawn(newDomino, connectionToClient);
+        RpcShowDominoes(newDomino);
+    }
+
+    [ClientRpc]
+    public void RpcShowDominoes(GameObject domino)
+    {
+        var dominoEntity = domino.GetComponent<DominoEntity>();
+        dominoEntity.UpdateDominoLabels();
+
+        if (hasAuthority)
+        {
+            var mover = domino.GetComponent<Mover>();
+
+            domino.transform.position = new Vector3(0, 0, 0);
+
+            // animate the movement for the current player
+            StartCoroutine(mover.MoveOverSeconds(playerBottomCenter, 2, 0));
+        }
+        else
+        {
+            domino.transform.position = playerTopCenter;
+        }
     }
 
     #endregion

@@ -5,11 +5,13 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField] private GameObject Domino;
+    [SerializeField] private DominoEntity Domino;
     [SerializeField] private Player Player;
     [SerializeField] private Camera MainCamera;
     [Range(0.1f, 0.5f)]
     [SerializeField] private float DistanceFromCamera;
+    [Range(0f, 0.1f)]
+    [SerializeField] private float DistanceFromCenter;
 
     private Quaternion dominoRotation = Quaternion.Euler(new Vector3(-90, 0, 180));
     private Camera playerCamera;
@@ -22,10 +24,13 @@ public class GameManager : MonoBehaviour
         // TODO: create Domino for each player
 
         playerCamera = MainCamera;
-        playerDominoCenter = GetPlayerCenter();
+        playerDominoCenter = GetPlayerCenter() - new Vector3(0, DistanceFromCenter, 0);
 
         // TODO: create 3 dominoes- one for each player and a third that only the host knows about
-        Instantiate(Domino, playerDominoCenter, playerCamera.transform.rotation * dominoRotation);
+        var sampleDomino = Instantiate(Domino, playerDominoCenter, playerCamera.transform.rotation * dominoRotation);
+        sampleDomino.TopScore = 1;
+        sampleDomino.BottomScore = 2;
+        sampleDomino.UpdateDominoLabels();
     }
 
     void Update()

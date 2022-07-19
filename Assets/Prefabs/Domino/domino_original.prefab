@@ -529,6 +529,8 @@ GameObject:
   - component: {fileID: 3829817927503114701}
   - component: {fileID: 2515166644452849899}
   - component: {fileID: 7813330819778563137}
+  - component: {fileID: -3747012877631595465}
+  - component: {fileID: -7640438156410046427}
   m_Layer: 0
   m_Name: domino_original
   m_TagString: Domino
@@ -634,3 +636,57 @@ MonoBehaviour:
   visible: 0
   m_AssetId: 04a3b17bc1ca13144bb0acdfdfccebb9
   hasSpawned: 0
+--- !u!114 &-3747012877631595465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3325560248140386328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65b452648498f6e4fb9033933850384a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  ID: 0
+  TopScore: 0
+  BottomScore: 0
+  Flipped: 0
+--- !u!114 &-7640438156410046427
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3325560248140386328}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b019cabac8815f54bb53de837470cc22, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

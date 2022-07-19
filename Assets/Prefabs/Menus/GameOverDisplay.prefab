@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1851203910599390470}
-  - component: {fileID: 1851203910599390471}
+  - component: {fileID: 121915979}
   m_Layer: 0
   m_Name: GameOverDisplay
   m_TagString: Untagged
@@ -33,7 +33,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1851203910599390471
+--- !u!114 &121915979
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -42,7 +42,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1851203910599390465}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93e2d182ca27baa43aef015f150bd00e, type: 3}
+  m_Script: {fileID: 11500000, guid: 91448e416f94a9a4a8ff9159e6a4121a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   winnerNameText: {fileID: 1851203911638187995}
@@ -542,7 +542,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1851203910599390471}
+      - m_Target: {fileID: 121915979}
         m_TargetAssemblyTypeName: GameOverDisplay, Assembly-CSharp
         m_MethodName: LeaveGame
         m_Mode: 1

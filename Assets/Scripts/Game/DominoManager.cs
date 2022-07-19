@@ -22,17 +22,6 @@ public class DominoManager : MonoBehaviour // TODO: this doesn't need to be a Mo
 
     private const int maxDots = 12;
 
-    // Start is called before the first frame update
-    void Start()
-    {
- 
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 
     public void SelectDomino(int dominoId)
     {        

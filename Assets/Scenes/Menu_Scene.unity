@@ -622,10 +622,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19c9ed53f9f3cb141896c9f81dc6f14e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Domino: {fileID: 3325560248140386328, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
+  Domino: {fileID: -3747012877631595465, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
   Player: {fileID: 315547288289211558, guid: 551f2c637c21cd244b49b2ce77ab0d61, type: 3}
   MainCamera: {fileID: 963194227}
-  DistanceFromCamera: 0.1
+  DistanceFromCamera: 0.13
+  DistanceFromCenter: 0.07
 --- !u!4 &1366723352
 Transform:
   m_ObjectHideFlags: 0
@@ -775,7 +776,9 @@ MonoBehaviour:
   playerSpawnMethod: 1
   spawnPrefabs:
   - {fileID: 3325560248140386328, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
+  - {fileID: 7874255730912142062, guid: dbe721723cd045945bd0b8a74d6b6636, type: 3}
   dominoPrefab: {fileID: 3325560248140386328, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
+  gameOverHandler: {fileID: 1373576781949793192, guid: dbe721723cd045945bd0b8a74d6b6636, type: 3}
   IsGameInProgress: 0
   Players: []
 --- !u!114 &1599705694
@@ -810,7 +813,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1774160016
 BoxCollider:
   m_ObjectHideFlags: 0

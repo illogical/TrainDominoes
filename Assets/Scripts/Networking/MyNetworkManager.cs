@@ -1,3 +1,4 @@
+using Assets.Scripts.Models;
 using Mirror;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using UnityEngine.SceneManagement;
 public class MyNetworkManager : NetworkManager
 {
     [SerializeField] private GameObject dominoPrefab = null;
-    //[SerializeField] private GameOverHandler gameOverHandler = null;
+    [SerializeField] private GameOverHandler gameOverHandler = null;
 
     public bool IsGameInProgress = false;
     public List<DominoPlayer> Players = new List<DominoPlayer>();
@@ -16,6 +17,35 @@ public class MyNetworkManager : NetworkManager
     public static event Action ClientOnDisconnected;
 
     public void SetTransport(Transport t) => transport = t;
+
+    // TODO: move this to GameManager when GameManager is ready to be used
+    private Quaternion dominoRotation = Quaternion.Euler(new Vector3(-90, 0, 180));
+
+    private List<GameObject> allDominoes = new List<GameObject>();
+    private int currentDominoIndex = 0;
+
+    public List<GameObject> GetDominoes() => allDominoes;
+    public GameObject GetNextDomino()
+    {
+        int nextIndex = currentDominoIndex;
+        currentDominoIndex = Mathf.Clamp(currentDominoIndex + 1, 0, allDominoes.Count - 1);
+
+        return allDominoes[nextIndex];
+    }
+
+    public void CreateDominoes()
+    {
+        // create sample dominoes on each client
+        for (int i = 0; i < 2; i++)
+        {
+            GameObject dominoInstance = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
+            var dominoEntity = dominoInstance.GetComponent<DominoEntity>();
+            dominoEntity.TopScore = i;
+            dominoEntity.BottomScore = i;
+            dominoEntity.UpdateDominoLabels();
+            allDominoes.Add(dominoInstance);
+        }
+    }
 
     #region Server
 
@@ -37,7 +67,6 @@ public class MyNetworkManager : NetworkManager
         //    );
 
         player.SetPartyOwner(Players.Count == 1);
-
     }
 
     public override void OnServerConnect(NetworkConnectionToClient conn)
@@ -64,18 +93,26 @@ public class MyNetworkManager : NetworkManager
 
     public override void OnServerSceneChanged(string sceneName)
     {
-        if (SceneManager.GetActiveScene().name.StartsWith("Scene_Map"))
+        if (SceneManager.GetActiveScene().name.StartsWith("Main_Scene"))
         {
-            //GameOverHandler gameOverHandlerInstance = Instantiate(gameOverHandler);
+            GameOverHandler gameOverHandlerInstance = Instantiate(gameOverHandler);
 
-            //NetworkServer.Spawn(gameOverHandlerInstance.gameObject);
+            NetworkServer.Spawn(gameOverHandlerInstance.gameObject);
 
+            int count = 1;
             foreach (DominoPlayer player in Players)
             {
                 // create the domino based upon an available domino on the server/host
-                GameObject dominoInstance = Instantiate(dominoPrefab, GetStartPosition().position, Quaternion.identity);
-                NetworkServer.Spawn(dominoInstance, player.connectionToClient);
+                //GameObject dominoInstance = Instantiate(dominoPrefab, GetStartPosition().position, Quaternion.identity);
+                GameObject dominoInstance = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
+                var dominoEntity = dominoInstance.GetComponent<DominoEntity>();
+                dominoEntity.TopScore = count;
+                dominoEntity.BottomScore = count;
+                allDominoes.Add(dominoInstance);
+                player.AddPlayerDomino(dominoInstance);
+                count++;
             }
+
         }
     }
 
@@ -116,6 +153,14 @@ public class MyNetworkManager : NetworkManager
     {
         Players.Clear();
     }
+
+    //[ClientRpc]
+    //public void RpcCreateDomino(int id, int top, int bottom, DominoPlayer player)
+    //{
+    //    GameObject dominoInstance = Instantiate(dominoPrefab, GetStartPosition().position, Quaternion.identity);
+
+    //    NetworkServer.Spawn(dominoInstance, player.connectionToClient);
+    //}
 
     #endregion
 }

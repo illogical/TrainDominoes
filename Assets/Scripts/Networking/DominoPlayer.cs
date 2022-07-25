@@ -17,6 +17,8 @@ public class DominoPlayer : NetworkBehaviour
     public static event Action<bool> AuthorityOnPartyOwnerStateUpdated;
     public event Action<int> ClientOnResourcesUpdated;
 
+    //public GameSession Session;
+
     public bool GetIsPartyOwner() => isPartyOwner;
     public string GetDisplayName() => displayName;
 
@@ -99,6 +101,7 @@ public class DominoPlayer : NetworkBehaviour
         // TODO: execute CmdDealDomino() when the turn begins for this player
         var newDomino = ((MyNetworkManager)NetworkManager.singleton).GetNextDomino();        
         NetworkServer.Spawn(newDomino, connectionToClient);
+        AddPlayerDomino(newDomino);
 
         RpcShowDominoes(newDomino);
     }
@@ -119,8 +122,20 @@ public class DominoPlayer : NetworkBehaviour
         }
         else
         {
+            // TODO: no longer render the other player's dominoes
             domino.transform.position = playerTopCenter;
         }
+    }
+
+    [ClientRpc]
+    public void RpcShowTableDominoes(GameObject domino)
+    {
+        var dominoEntity = domino.GetComponent<DominoEntity>();
+        dominoEntity.UpdateDominoLabels();
+
+        //var mover = domino.GetComponent<Mover>();
+        domino.transform.position = Vector3.zero;// new Vector3(1, 1, 1);
+        //StartCoroutine(mover.MoveOverSeconds(Vector3.zero, 0.3f, 0));
     }
 
     #endregion

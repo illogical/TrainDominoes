@@ -78,7 +78,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  dominoPrefab: {fileID: 3325560248140386328, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
   cameraTransform: {fileID: 5227187003254142932}
   myDominoes: []
 --- !u!1 &4950408471407030121

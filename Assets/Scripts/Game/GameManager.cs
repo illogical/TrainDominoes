@@ -6,8 +6,8 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     [SerializeField] private DominoEntity Domino;
-    [SerializeField] private Player Player;
-    [SerializeField] private Camera MainCamera;
+    //[SerializeField] private Player Player;
+    //[SerializeField] private Camera MainCamera;
     [Range(0.1f, 0.5f)]
     [SerializeField] private float DistanceFromCamera;
     [Range(0f, 0.1f)]
@@ -23,8 +23,8 @@ public class GameManager : MonoBehaviour
         // create domino
         // TODO: create Domino for each player
 
-        playerCamera = MainCamera;
-        playerDominoCenter = GetPlayerCenter() - new Vector3(0, DistanceFromCenter, 0);
+        //playerCamera = MainCamera;
+        //playerDominoCenter = GetPlayerCenter() - new Vector3(0, DistanceFromCenter, 0);
 
         // TODO: create 3 dominoes- one for each player and a third that only the host knows about
         //var sampleDomino = Instantiate(Domino, playerDominoCenter, playerCamera.transform.rotation * dominoRotation);
@@ -38,11 +38,11 @@ public class GameManager : MonoBehaviour
 
     }
 
-    Vector3 GetPlayerCenter()
-    {
-        // TODO: will this direction differ per player if all players are looking at one another? Might need a switch statement that returns a Vector3 pointing in the direction the player is pointed
-        return playerCamera.transform.position + new Vector3(0, 0, DistanceFromCamera);
-    }
+    //Vector3 GetPlayerCenter()
+    //{
+    //    // TODO: will this direction differ per player if all players are looking at one another? Might need a switch statement that returns a Vector3 pointing in the direction the player is pointed
+    //    return playerCamera.transform.position + new Vector3(0, 0, DistanceFromCamera);
+    //}
 
     // TODO: bare basic POC:
     /*

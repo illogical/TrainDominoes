@@ -50,8 +50,6 @@ namespace Assets.Scripts.Game
             var nextDominoEntity = dominoData[availableDominoes[0]];
             availableDominoes.RemoveAt(0);
 
-            Debug.Log("GetNextDomino() executed");
-
             //GameObject dominoInstance = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
             //var dom = dominoInstance.GetComponent<DominoEntity>();
             //dom.ID = nextDominoEntity.ID;

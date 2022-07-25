@@ -132,9 +132,12 @@ public class DominoPlayer : NetworkBehaviour
     {
         var dominoEntity = domino.GetComponent<DominoEntity>();
         dominoEntity.UpdateDominoLabels();
+        domino.transform.position += new Vector3(0, 0.05f, 0);
+
+        Debug.Log("RpcShowTableDominoes was called");
 
         //var mover = domino.GetComponent<Mover>();
-        domino.transform.position = Vector3.zero;// new Vector3(1, 1, 1);
+        //domino.transform.position = Vector3.zero;// new Vector3(1, 1, 1);
         //StartCoroutine(mover.MoveOverSeconds(Vector3.zero, 0.3f, 0));
     }
 

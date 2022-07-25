@@ -26,6 +26,7 @@ public class MyNetworkManager : NetworkManager
     // TODO: move this to GameManager when GameManager is ready to be used
     private List<GameObject> allDominoes = new List<GameObject>();
     //private int currentDominoIndex = 0;
+    private Vector3 middle = new Vector3(0, 1.02f, -9.87f);
 
     private DominoTracker dominoTracker = new DominoTracker();
 
@@ -105,10 +106,13 @@ public class MyNetworkManager : NetworkManager
 
             // TODO: how to allow clients to see this?
             // create a server Domino in the center
+            // TODO: STUCK HERE 7/24/22. How the hell do I create/display a table domino?
+            var domino = CreateTableDominoes();
 
-
+        
             foreach (DominoPlayer player in Players)
             {
+                //player.RpcShowTableDominoes(domino);
                 // create a game session on each client
                 //NetworkServer.Spawn(gameSessionInstance.gameObject, player.connectionToClient);
 
@@ -131,6 +135,19 @@ public class MyNetworkManager : NetworkManager
             dominoEntity.BottomScore = i + 1;
             allDominoes.Add(dominoInstance);
         }
+    }
+
+    [Server]
+    public GameObject CreateTableDominoes()
+    {
+        var domino = GetNextDomino();
+        domino.gameObject.transform.position = middle;
+        var entity = domino.GetComponent<DominoEntity>();
+
+        NetworkServer.Spawn(domino);
+        entity.UpdateDominoLabels();    // TODO: how to run this on all clients?
+
+        return domino;
     }
 
     public override void OnServerDisconnect(NetworkConnectionToClient conn)

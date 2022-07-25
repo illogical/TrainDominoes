@@ -344,17 +344,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8015a3d21ddef2345a7d0eccfa47b4f0, type: 3}
---- !u!114 &501788883 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1199748838697998528, guid: 8015a3d21ddef2345a7d0eccfa47b4f0, type: 3}
-  m_PrefabInstance: {fileID: 501788882}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e5f9404750a81049b136ac466dafed2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &582550153
 GameObject:
   m_ObjectHideFlags: 0
@@ -807,7 +796,6 @@ MonoBehaviour:
   - {fileID: 1199748838697998531, guid: 8015a3d21ddef2345a7d0eccfa47b4f0, type: 3}
   dominoPrefab: {fileID: 3325560248140386328, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
   gameOverHandler: {fileID: 1373576781949793192, guid: dbe721723cd045945bd0b8a74d6b6636, type: 3}
-  GameSession: {fileID: 501788883}
   IsGameInProgress: 0
   Players: []
 --- !u!114 &1599705694

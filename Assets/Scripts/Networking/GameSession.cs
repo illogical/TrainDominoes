@@ -1,6 +1,7 @@
 using Assets.Scripts.Models;
 using Mirror;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 public class GameSession : NetworkBehaviour
@@ -8,15 +9,18 @@ public class GameSession : NetworkBehaviour
     [SerializeField] private GameObject dominoPrefab = null;
 
     private DominoPlayer dominoPlayer;  // TODO: reference to current local player might be convenient
-    private SyncDictionary<int, DominoEntity> dominoData = new SyncDictionary<int, DominoEntity>();
-    private SyncList<int> availableDominoes = new SyncList<int>();  // TODO: ensure the clients don't have this list
+    private Dictionary<int, DominoInfo> dominoData = new Dictionary<int, DominoInfo>();
+    private List<int> availableDominoes = new List<int>();  // TODO: ensure the clients don't have this list
 
     private Quaternion dominoRotation = Quaternion.Euler(new Vector3(-90, 0, 180));
 
     private Vector3 playerTopCenter = new Vector3(0, 1.07f, -9.87f);
     private Vector3 playerBottomCenter = new Vector3(0, 0.93f, -9.87f);
+    private Vector3 tablePosition = new Vector3(0, 1, -9.8f);
 
+    private GameObject tableDomino;
 
+    private bool gameStarted = false;
 
 
     private void Start()
@@ -31,12 +35,32 @@ public class GameSession : NetworkBehaviour
         //{
         //    // TODO: run command to create Domino. Later I want this to create a Round and GameManager can create the dominoes.
         //}
+        StartGame();
+        //Ping(nameof(Start), true);
+
     }
 
+    private void Update()
+    {
+        if(!gameStarted)
+        {
+            gameStarted = true;
+            
+            if(isServer)
+            {
+                GameSessionTest();
+            }
+        }
+    }
 
     public void StartGame()
     {
-        CreateFakeDominoes();
+        NetworkDebugger.OutputAuthority(this, nameof(StartGame), true);
+
+        if (isServer)
+        {
+            CreateFakeDominoes();
+        }
 
 
         // TODO: how to create a table domino?
@@ -45,6 +69,7 @@ public class GameSession : NetworkBehaviour
         //RpcShowTableDominoes(firstDomino);
     }
 
+
     #region Server
 
     public override void OnStartServer()
@@ -52,8 +77,6 @@ public class GameSession : NetworkBehaviour
         base.OnStartServer();
 
         DontDestroyOnLoad(gameObject);
-
-        StartGame();
     }
 
     [Server]
@@ -63,50 +86,79 @@ public class GameSession : NetworkBehaviour
         {
             //GameObject dominoInstance = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
             //dominoInstance.GetComponent<DominoEntity>();        
-            var dominoEntity = new DominoEntity()
-            { 
-                ID = i + 1,
-                TopScore = i + 1,
-                BottomScore = i + 1
-            }; 
-               
-            dominoData.Add(i, dominoEntity);
+            //var dominoEntity = new DominoEntity()
+            //{ 
+            //    ID = i + 1,
+            //    TopScore = i + 1,
+            //    BottomScore = i + 1
+            //};
+
+            //var dominoInstance = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
+            //var dominoEntity = dominoInstance.GetComponent<DominoEntity>();
+            var score = i + 1;
+            var dominoInfo = new DominoInfo()
+            {
+                ID = score,
+                TopScore = score,
+                BottomScore = score,
+            };
+            
+            //dominoEntity.ID = score;
+            //dominoEntity.TopScore = score;
+            //dominoEntity.BottomScore = score;
+
+            dominoData.Add(i, dominoInfo);
             availableDominoes.Add(i);
         }
     }
 
+
+    // TODO: use these instead of using DominoPlayer
     [Server]
-    public GameObject GetNextDomino()
+    public DominoInfo GetNextDomino()
     {
         if(availableDominoes.Count == 0)
         {
             Debug.LogError("Server is out of dominoes");
         }
+
         //int nextIndex = currentDominoIndex;
         //currentDominoIndex = Mathf.Clamp(currentDominoIndex + 1, 0, dominoData.Count - 1);
 
-        var nextDominoEntity = dominoData[availableDominoes[0]];
-
-        GameObject dominoInstance = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
-        var dom = dominoInstance.GetComponent<DominoEntity>();
-        dom.ID = nextDominoEntity.ID;
-        dom.TopScore = nextDominoEntity.ID;
-        dom.BottomScore = nextDominoEntity.ID;
+        var nextDominoEntity = dominoData[availableDominoes[0]];       
 
         availableDominoes.RemoveAt(0);
 
-        return dominoInstance;
+        return nextDominoEntity;
     }
 
     [Server]
-    public void Test(NetworkConnectionToClient conn)      // THIS WORKED!!!!!!! Only for the client who is also the server :(
+    public void GameSessionTest()
     {
-        // TODO: execute CmdDealDomino() when the turn begins for this player
-        var newDomino = GetNextDomino();
-        NetworkServer.Spawn(newDomino, conn);
-        //AddPlayerDomino(newDomino);
+        
+            NetworkDebugger.OutputAuthority(this, nameof(GameSessionTest));
+            // TODO: execute CmdDealDomino() when the turn begins for this player
+            var dominoInfo = GetNextDomino();
 
-        RpcShowDominoes(newDomino);
+            tableDomino = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
+            var dom = tableDomino.GetComponent<DominoEntity>();
+            // TODO: move this to when the server creates the instance
+
+
+            //dom.UpdateDominoLabels();
+
+            dom.ID = dominoInfo.ID;
+            dom.TopScore = dominoInfo.ID;
+            dom.BottomScore = dominoInfo.ID;
+
+            NetworkServer.Spawn(tableDomino);
+            //NetworkServer.Spawn(tableDomino, connectionToClient);
+            //AddPlayerDomino(newDomino);
+
+            RpcShowTableDominoes(tableDomino);
+        
+
+        
     }
 
     #endregion Server
@@ -118,20 +170,30 @@ public class GameSession : NetworkBehaviour
     {
         base.OnStartClient();
 
+        NetworkDebugger.OutputAuthority(this, nameof(OnStartLocalPlayer));
+
         if (NetworkServer.active) { return; }
 
         DontDestroyOnLoad(gameObject);
     }
 
-    // TODO: maybe instead make this event based? could invoke an event on the player
-
     //[Command(requiresAuthority = false)]
     [Command(requiresAuthority = false)]
     public void CmdDealDomino()
     {
-        if (!isServer) { return; }
+        //if (!isServer) { return; }
         // TODO: execute CmdDealDomino() when the turn begins for this player
-        var newDomino = GetNextDomino(); // ((MyNetworkManager)NetworkManager.singleton).GetNextDomino(); // TODO: this has to happen on the server
+        //var newDomino = GetNextDomino(); // ((MyNetworkManager)NetworkManager.singleton).GetNextDomino(); // TODO: this has to happen on the server
+
+        var dominoInfo = GetNextDomino();
+
+        var newDomino = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
+        var dom = tableDomino.GetComponent<DominoEntity>();
+        // TODO: move this to when the server creates the instance
+        dom.ID = dominoInfo.ID;
+        dom.TopScore = dominoInfo.ID;
+        dom.BottomScore = dominoInfo.ID;
+
         NetworkServer.Spawn(newDomino, connectionToClient);
         //AddPlayerDomino(newDomino);
 
@@ -162,12 +224,14 @@ public class GameSession : NetworkBehaviour
     [ClientRpc]
     public void RpcShowTableDominoes(GameObject domino)
     {
+        NetworkDebugger.OutputAuthority(this, nameof(RpcShowTableDominoes), true);
         var dominoEntity = domino.GetComponent<DominoEntity>();
         dominoEntity.UpdateDominoLabels();
 
         var mover = domino.GetComponent<Mover>();
-        domino.transform.position = Vector3.zero;// new Vector3(1, 1, 1);
-        //StartCoroutine(mover.MoveOverSeconds(Vector3.zero, 0.3f, 0));
+        domino.transform.position = tablePosition;//Vector3.zero;
+        // TODO: why does this animation only work on the client that is the server? Probably because it has authority.
+        StartCoroutine(mover.MoveOverSeconds(tablePosition, 0.5f, 0));       //domino.transform.position += new Vector3(0, 1, -9.8f);
     }
 
     #endregion Client

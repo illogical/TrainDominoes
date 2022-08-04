@@ -2,6 +2,7 @@ using Assets.Scripts.Models;
 using Mirror;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 
 public class DominoPlayer : NetworkBehaviour
@@ -17,7 +18,7 @@ public class DominoPlayer : NetworkBehaviour
     public static event Action<bool> AuthorityOnPartyOwnerStateUpdated;
     public event Action<int> ClientOnResourcesUpdated;
 
-    //public GameSession Session;
+    //public GameSession Session;       // TODO: Use GetComponent<GameSession>() to get this somehow. Need each player (or an object owned by the player) to request dominoes (GameSession to own the domino set)
 
     public bool GetIsPartyOwner() => isPartyOwner;
     public string GetDisplayName() => displayName;
@@ -29,6 +30,12 @@ public class DominoPlayer : NetworkBehaviour
     public void AddPlayerDomino(GameObject domino)
     {
         myDominoes.Add(domino);
+    }
+
+
+    public void Start()
+    {
+        NetworkDebugger.OutputAuthority(this, $"DominoPlayer.Start() ({displayName})", true);
     }
 
     #region Server
@@ -45,6 +52,7 @@ public class DominoPlayer : NetworkBehaviour
 
         ((MyNetworkManager)NetworkManager.singleton).StartGame();
     }
+
 
     [Server]
     public void SetPartyOwner(bool state)
@@ -98,6 +106,7 @@ public class DominoPlayer : NetworkBehaviour
     [Command]
     public void CmdDealDomino()
     {
+        NetworkDebugger.OutputAuthority(this, nameof(CmdDealDomino));
         // TODO: execute CmdDealDomino() when the turn begins for this player
         var newDomino = ((MyNetworkManager)NetworkManager.singleton).GetNextDomino();        
         NetworkServer.Spawn(newDomino, connectionToClient);
@@ -109,6 +118,7 @@ public class DominoPlayer : NetworkBehaviour
     [ClientRpc]
     public void RpcShowDominoes(GameObject domino)
     {
+        NetworkDebugger.OutputAuthority(this, nameof(RpcShowDominoes));
         var dominoEntity = domino.GetComponent<DominoEntity>();
         dominoEntity.UpdateDominoLabels();
 
@@ -127,19 +137,6 @@ public class DominoPlayer : NetworkBehaviour
         }
     }
 
-    [ClientRpc]
-    public void RpcShowTableDominoes(GameObject domino)
-    {
-        var dominoEntity = domino.GetComponent<DominoEntity>();
-        dominoEntity.UpdateDominoLabels();
-        domino.transform.position += new Vector3(0, 0.05f, 0);
-
-        Debug.Log("RpcShowTableDominoes was called");
-
-        //var mover = domino.GetComponent<Mover>();
-        //domino.transform.position = Vector3.zero;// new Vector3(1, 1, 1);
-        //StartCoroutine(mover.MoveOverSeconds(Vector3.zero, 0.3f, 0));
-    }
 
     #endregion
 

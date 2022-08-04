@@ -10,7 +10,7 @@ namespace Assets.Scripts.Game
 {
     public class DominoTracker
     {
-        private Dictionary<int, DominoEntity> dominoData = new Dictionary<int, DominoEntity>();
+        private Dictionary<int, DominoInfo> dominoData = new Dictionary<int, DominoInfo>();
         private List<int> availableDominoes = new List<int>();
 
         private Quaternion dominoRotation = Quaternion.Euler(new Vector3(-90, 0, 180));
@@ -23,10 +23,8 @@ namespace Assets.Scripts.Game
         public void CreateFakeDominoes()
         {
             for (int i = 0; i < 10; i++)
-            {
-                //GameObject dominoInstance = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
-                //dominoInstance.GetComponent<DominoEntity>();        
-                var dominoEntity = new DominoEntity()
+            {      
+                var dominoEntity = new DominoInfo()
                 {
                     ID = i + 1,
                     TopScore = i + 1,
@@ -38,24 +36,14 @@ namespace Assets.Scripts.Game
             }
         }
 
-        public DominoEntity GetNextDomino()
+        public DominoInfo GetNextDomino()
         {
             if (availableDominoes.Count == 0)
             {
                 Debug.LogError("Server is out of dominoes");
             }
-            //int nextIndex = currentDominoIndex;
-            //currentDominoIndex = Mathf.Clamp(currentDominoIndex + 1, 0, dominoData.Count - 1);
-
             var nextDominoEntity = dominoData[availableDominoes[0]];
             availableDominoes.RemoveAt(0);
-
-            //GameObject dominoInstance = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
-            //var dom = dominoInstance.GetComponent<DominoEntity>();
-            //dom.ID = nextDominoEntity.ID;
-            //dom.TopScore = nextDominoEntity.ID;
-            //dom.BottomScore = nextDominoEntity.ID;
-
 
 
             return nextDominoEntity;

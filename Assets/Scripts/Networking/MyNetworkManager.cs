@@ -104,23 +104,7 @@ public class MyNetworkManager : NetworkManager
 
             dominoTracker.CreateFakeDominoes();
 
-            // TODO: how to allow clients to see this?
-            // create a server Domino in the center
-            // TODO: STUCK HERE 7/24/22. How the hell do I create/display a table domino?
-            var domino = CreateTableDominoes();
 
-        
-            foreach (DominoPlayer player in Players)
-            {
-                //player.RpcShowTableDominoes(domino);
-                // create a game session on each client
-                //NetworkServer.Spawn(gameSessionInstance.gameObject, player.connectionToClient);
-
-                //var entity = domino.GetComponent<DominoEntity>();
-                //entity.ID = domData.ID;
-                //entity.TopScore = domData.TopScore;
-                //entity.BottomScore = domData.BottomScore;                
-            }
         }
     }
 
@@ -188,13 +172,6 @@ public class MyNetworkManager : NetworkManager
         Players.Clear();
     }
 
-    //[ClientRpc]
-    //public void RpcCreateDomino(int id, int top, int bottom, DominoPlayer player)
-    //{
-    //    GameObject dominoInstance = Instantiate(dominoPrefab, GetStartPosition().position, Quaternion.identity);
-
-    //    NetworkServer.Spawn(dominoInstance, player.connectionToClient);
-    //}
 
     #endregion
 }

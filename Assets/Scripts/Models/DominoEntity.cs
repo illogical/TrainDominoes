@@ -1,21 +1,19 @@
-﻿using Mirror;
+﻿using Assets.Scripts.Interfaces;
+using Mirror;
 using TMPro;
-using UnityEditor;
-using UnityEngine;
 
 namespace Assets.Scripts.Models
 {
     public class DominoEntity : NetworkBehaviour
     {
         public int ID;
-        [SyncVar]
+        [SyncVar(hook = nameof(OnTopScoreChanged))]
         public int TopScore;
-        [SyncVar]
+        [SyncVar(hook = nameof(OnBottomScoreChanged))]
         public int BottomScore;
-        [SyncVar]
+        [SyncVar(hook = nameof(OnFlippedChanged))]
         public bool Flipped;
 
-        [ClientCallback]
         public void UpdateDominoLabels()
         {
             var labels = gameObject.GetComponentsInChildren<TextMeshPro>();
@@ -29,6 +27,54 @@ namespace Assets.Scripts.Models
 
             labels[1].SetText(TopScore.ToString());
             labels[2].SetText(BottomScore.ToString());
+        }
+
+        public void OnTopScoreChanged(int oldValue, int newValue)
+        {
+            //if (!hasAuthority) { return; }
+
+            var labels = gameObject.GetComponentsInChildren<TextMeshPro>();
+            if (Flipped)
+            {
+                labels[2].SetText(newValue.ToString());
+                return;
+            }
+
+            labels[1].SetText(newValue.ToString());
+        }
+
+        public void OnBottomScoreChanged(int oldValue, int newValue)
+        {
+            //if (!hasAuthority) { return; }
+
+            var labels = gameObject.GetComponentsInChildren<TextMeshPro>();
+            if (Flipped)
+            {
+                labels[1].SetText(newValue.ToString());
+                return;
+            }
+
+            labels[2].SetText(newValue.ToString());
+        }
+
+        public void OnFlippedChanged(bool oldValue, bool newValue)
+        {
+            var labels = gameObject.GetComponentsInChildren<TextMeshPro>();
+
+            if (newValue)
+            {
+                labels[1].SetText(BottomScore.ToString());
+                labels[2].SetText(TopScore.ToString());
+                return;
+            }
+
+            labels[1].SetText(TopScore.ToString());
+            labels[2].SetText(BottomScore.ToString());
+        }
+
+        public void SwapAuthority()
+        {
+
         }
     }
 }

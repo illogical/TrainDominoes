@@ -2,51 +2,76 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace Assets.Scripts.Game
 {
     public class DominoTracker
     {
-        private Dictionary<int, DominoInfo> dominoData = new Dictionary<int, DominoInfo>();
+        public Dictionary<int, DominoInfo> AllDominoes = new Dictionary<int, DominoInfo>();
         private List<int> availableDominoes = new List<int>();
 
-        private Quaternion dominoRotation = Quaternion.Euler(new Vector3(-90, 0, 180));
+        private List<int> engineIndices = new List<int>();
 
-        private Vector3 playerTopCenter = new Vector3(0, 1.07f, -9.87f);
-        private Vector3 playerBottomCenter = new Vector3(0, 0.93f, -9.87f);
+        private const int maxDots = 12;
 
-        public Quaternion GetDominoRotation() => dominoRotation;
-
-        public void CreateFakeDominoes()
+        /// <summary>
+        /// Creates 91 dominoes based upon 12 point max train domino set
+        /// </summary>
+        public void CreateDominoSet()
         {
-            for (int i = 0; i < 10; i++)
-            {      
-                var dominoEntity = new DominoInfo()
+            var index = 0;
+            for (int i = 0; i < maxDots + 1; i++)
+            {
+                for (int j = i; j < maxDots + 1; j++)
                 {
-                    ID = i + 1,
-                    TopScore = i + 1,
-                    BottomScore = i + 1
-                };
+                    AllDominoes.Add(index, createDomino(i, j, index));
+                    availableDominoes.Add(index);
 
-                dominoData.Add(i, dominoEntity);
-                availableDominoes.Add(i);
+                    if (i == j)
+                    {
+                        // track index for each double
+                        engineIndices.Add(index);
+                    }
+
+                    index++;
+                }
             }
+
+            engineIndices.Reverse();
         }
 
-        public DominoInfo GetNextDomino()
+        //public DominoInfo GetNextDomino()
+        //{
+        //    if (availableDominoes.Count == 0)
+        //    {
+        //        Debug.LogError("Server is out of dominoes");
+        //    }
+        //    var nextDominoEntity = AllDominoes[availableDominoes[0]];
+        //    availableDominoes.RemoveAt(0);
+
+
+        //    return nextDominoEntity;
+        //}
+
+        public DominoInfo GetDominoFromBonePile()
         {
-            if (availableDominoes.Count == 0)
+            int randomDominoIndex = UnityEngine.Random.Range(0, availableDominoes.Count);
+            int dominoID = availableDominoes[randomDominoIndex];
+            var domino = AllDominoes[dominoID];
+
+            availableDominoes.RemoveAt(randomDominoIndex);
+            return domino;
+        }
+
+        private DominoInfo createDomino(int topScore, int bottomScore, int index)
+        {
+            return new DominoInfo()
             {
-                Debug.LogError("Server is out of dominoes");
-            }
-            var nextDominoEntity = dominoData[availableDominoes[0]];
-            availableDominoes.RemoveAt(0);
-
-
-            return nextDominoEntity;
+                TopScore = topScore,
+                BottomScore = bottomScore,
+                ID = index
+            };
         }
     }
 }

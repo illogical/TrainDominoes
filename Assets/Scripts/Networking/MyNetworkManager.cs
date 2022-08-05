@@ -34,7 +34,7 @@ public class MyNetworkManager : NetworkManager
     public List<GameObject> GetDominoes() => allDominoes;
     public GameObject GetNextDomino()
     {
-        var nextDominoEntity = dominoTracker.GetNextDomino();
+        var nextDominoEntity = dominoTracker.GetDominoFromBonePile();
         
         // TODO: move the mesh creation to a MeshManager. How can the mesh manager decide where to position this?
         GameObject dominoInstance = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
@@ -101,37 +101,7 @@ public class MyNetworkManager : NetworkManager
             // create a game session on the server
             //NetworkServer.Spawn(gameSessionInstance.gameObject);  // TODO: not sure if this is needed but the client doesn't know how run the command on it
             //gameSessionInstance.StartGame();
-
-            dominoTracker.CreateFakeDominoes();
-
-
         }
-    }
-
-    [Server]
-    public void CreateDominoes()    // TODO: move CreateDominoes to GameSession
-    {
-        for (int i = 0; i < 10; i++)
-        {
-            GameObject dominoInstance = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
-            var dominoEntity = dominoInstance.GetComponent<DominoEntity>();
-            dominoEntity.TopScore = i + 1;
-            dominoEntity.BottomScore = i + 1;
-            allDominoes.Add(dominoInstance);
-        }
-    }
-
-    [Server]
-    public GameObject CreateTableDominoes()
-    {
-        var domino = GetNextDomino();
-        domino.gameObject.transform.position = middle;
-        var entity = domino.GetComponent<DominoEntity>();
-
-        NetworkServer.Spawn(domino);
-        entity.UpdateDominoLabels();    // TODO: how to run this on all clients?
-
-        return domino;
     }
 
     public override void OnServerDisconnect(NetworkConnectionToClient conn)

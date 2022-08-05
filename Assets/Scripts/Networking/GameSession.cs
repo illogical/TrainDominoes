@@ -1,9 +1,11 @@
+using Assets.Scripts.Game;
 using Assets.Scripts.Models;
 using Mirror;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
+// TODO: make this a singleton for convenience?
 public class GameSession : NetworkBehaviour
 {
     [SerializeField] private GameObject dominoPrefab = null;
@@ -22,22 +24,16 @@ public class GameSession : NetworkBehaviour
 
     private bool gameStarted = false;
 
+    public DominoTracker Dominoes = new DominoTracker();
+
 
     private void Start()
     {
-        // TODO: this almost works. Major flaw though. The client-only loses track of the domino that the server/client has.
         //NetworkIdentity identity = NetworkClient.connection.identity;
-
         //dominoPlayer = identity.GetComponent<DominoPlayer>();
         //dominoPlayer.CmdDealDomino();
 
-        //if(hasAuthority)
-        //{
-        //    // TODO: run command to create Domino. Later I want this to create a Round and GameManager can create the dominoes.
-        //}
         StartGame();
-        //Ping(nameof(Start), true);
-
     }
 
     private void Update()
@@ -48,7 +44,7 @@ public class GameSession : NetworkBehaviour
             
             if(isServer)
             {
-                GameSessionTest();
+                CreateTableDomino();
             }
         }
     }
@@ -59,7 +55,8 @@ public class GameSession : NetworkBehaviour
 
         if (isServer)
         {
-            CreateFakeDominoes();
+            //CreateFakeDominoes();
+            Dominoes.CreateDominoSet();
         }
 
 
@@ -133,32 +130,45 @@ public class GameSession : NetworkBehaviour
     }
 
     [Server]
-    public void GameSessionTest()
+    public GameObject GetNewDomino()   // TODO: pass int to determine how many dominoes to create. Need this for StartGame()
     {
-        
-            NetworkDebugger.OutputAuthority(this, nameof(GameSessionTest));
-            // TODO: execute CmdDealDomino() when the turn begins for this player
-            var dominoInfo = GetNextDomino();
+        var dominoInfo = Dominoes.GetDominoFromBonePile();
 
-            tableDomino = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
-            var dom = tableDomino.GetComponent<DominoEntity>();
-            // TODO: move this to when the server creates the instance
+        var newDomino = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
+        var dom = newDomino.GetComponent<DominoEntity>();
+        dom.ID = dominoInfo.ID;
+        dom.TopScore = dominoInfo.TopScore;
+        dom.BottomScore = dominoInfo.BottomScore;
 
+        return newDomino;
+    }
 
-            //dom.UpdateDominoLabels();
+    [Server]
+    public void CreateTableDomino()
+    {
+        tableDomino = GetNewDomino();
+        NetworkServer.Spawn(tableDomino);
 
-            dom.ID = dominoInfo.ID;
-            dom.TopScore = dominoInfo.ID;
-            dom.BottomScore = dominoInfo.ID;
+        RpcShowTableDominoes(tableDomino);
+    }
 
-            NetworkServer.Spawn(tableDomino);
-            //NetworkServer.Spawn(tableDomino, connectionToClient);
-            //AddPlayerDomino(newDomino);
+    //[Command(requiresAuthority = false)]
+    [Command] // runs on server but is called by client
+    public void CmdDealDomino()
+    {
+        var dominoInfo = GetNextDomino();
 
-            RpcShowTableDominoes(tableDomino);
-        
+        var newDomino = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
+        var dom = tableDomino.GetComponent<DominoEntity>();
+        // TODO: move this to when the server creates the instance
+        dom.ID = dominoInfo.ID;
+        dom.TopScore = dominoInfo.ID;
+        dom.BottomScore = dominoInfo.ID;
 
-        
+        NetworkServer.Spawn(newDomino, connectionToClient);
+        //AddPlayerDomino(newDomino);
+
+        RpcShowDominoes(newDomino);
     }
 
     #endregion Server
@@ -177,28 +187,6 @@ public class GameSession : NetworkBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    //[Command(requiresAuthority = false)]
-    [Command(requiresAuthority = false)]
-    public void CmdDealDomino()
-    {
-        //if (!isServer) { return; }
-        // TODO: execute CmdDealDomino() when the turn begins for this player
-        //var newDomino = GetNextDomino(); // ((MyNetworkManager)NetworkManager.singleton).GetNextDomino(); // TODO: this has to happen on the server
-
-        var dominoInfo = GetNextDomino();
-
-        var newDomino = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
-        var dom = tableDomino.GetComponent<DominoEntity>();
-        // TODO: move this to when the server creates the instance
-        dom.ID = dominoInfo.ID;
-        dom.TopScore = dominoInfo.ID;
-        dom.BottomScore = dominoInfo.ID;
-
-        NetworkServer.Spawn(newDomino, connectionToClient);
-        //AddPlayerDomino(newDomino);
-
-        RpcShowDominoes(newDomino);
-    }
 
     [ClientRpc]
     public void RpcShowDominoes(GameObject domino)

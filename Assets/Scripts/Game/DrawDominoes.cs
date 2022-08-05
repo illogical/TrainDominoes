@@ -12,7 +12,7 @@ public class DrawDominoes : NetworkBehaviour
         // this had worked before trying to run this same command from a GameSession object
         NetworkIdentity identity = NetworkClient.connection.identity;
         var dominoPlayer = identity.GetComponent<DominoPlayer>();
-        dominoPlayer.CmdDealDomino();
+        dominoPlayer.CmdAddPlayerDomino();
 
 
         // the button is owned by the server. Does that have anything to do with my challenges?

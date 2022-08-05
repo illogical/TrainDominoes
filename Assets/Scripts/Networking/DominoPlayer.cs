@@ -104,7 +104,7 @@ public class DominoPlayer : NetworkBehaviour
     }
 
     [Command]
-    public void CmdDealDomino()
+    public void CmdDealDomino() // TODO: pass in the gameobject from GameSession
     {
         NetworkDebugger.OutputAuthority(this, nameof(CmdDealDomino));
         // TODO: execute CmdDealDomino() when the turn begins for this player
@@ -113,6 +113,19 @@ public class DominoPlayer : NetworkBehaviour
         AddPlayerDomino(newDomino);
 
         RpcShowDominoes(newDomino);
+    }
+
+    [Command]
+    public void CmdAddPlayerDomino()
+    {
+        // TODO: pretending that GameSession becomes a singleton, maybe this should call it instead of the other way around?
+        var gameSession = FindObjectOfType<GameSession>();
+        var freshDomino = gameSession.GetNewDomino();
+
+        NetworkServer.Spawn(freshDomino, connectionToClient);    // TODO: will connectionToClient be null if this is sent from GameSession?
+        AddPlayerDomino(freshDomino);
+
+        RpcShowDominoes(freshDomino);
     }
 
     [ClientRpc]

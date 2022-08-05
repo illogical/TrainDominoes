@@ -7,7 +7,6 @@ using UnityEngine;
 
 public class DominoPlayer : NetworkBehaviour
 {
-    [SerializeField] private Transform cameraTransform = null;
     [SyncVar(hook = nameof(AuthorityHandlePartyOwnerStateUpdated))]
     private bool isPartyOwner = false;
     [SyncVar(hook = nameof(ClientHandleDisplayNameUpdated))]
@@ -16,7 +15,6 @@ public class DominoPlayer : NetworkBehaviour
 
     public static event Action ClientOnInfoUpdated;
     public static event Action<bool> AuthorityOnPartyOwnerStateUpdated;
-    public event Action<int> ClientOnResourcesUpdated;
 
     //public GameSession Session;       // TODO: Use GetComponent<GameSession>() to get this somehow. Need each player (or an object owned by the player) to request dominoes (GameSession to own the domino set)
 
@@ -24,8 +22,8 @@ public class DominoPlayer : NetworkBehaviour
     public string GetDisplayName() => displayName;
 
     // TODO: Move this logic elsewhere
-    private Vector3 playerTopCenter = new Vector3(0, 1.07f, -9.87f);
-    private Vector3 playerBottomCenter = new Vector3(0, 0.93f, -9.87f);
+    private Vector3 playerTopCenter = new Vector3(0, 0.095f, -9.7f);
+    private Vector3 playerBottomCenter = new Vector3(0, -0.095f, -9.7f);
 
     public void AddPlayerDomino(GameObject domino)
     {
@@ -104,18 +102,6 @@ public class DominoPlayer : NetworkBehaviour
     }
 
     [Command]
-    public void CmdDealDomino() // TODO: pass in the gameobject from GameSession
-    {
-        NetworkDebugger.OutputAuthority(this, nameof(CmdDealDomino));
-        // TODO: execute CmdDealDomino() when the turn begins for this player
-        var newDomino = ((MyNetworkManager)NetworkManager.singleton).GetNextDomino();        
-        NetworkServer.Spawn(newDomino, connectionToClient);
-        AddPlayerDomino(newDomino);
-
-        RpcShowDominoes(newDomino);
-    }
-
-    [Command]
     public void CmdAddPlayerDomino()
     {
         // TODO: pretending that GameSession becomes a singleton, maybe this should call it instead of the other way around?
@@ -124,7 +110,6 @@ public class DominoPlayer : NetworkBehaviour
 
         NetworkServer.Spawn(freshDomino, connectionToClient);    // TODO: will connectionToClient be null if this is sent from GameSession?
         AddPlayerDomino(freshDomino);
-
         RpcShowDominoes(freshDomino);
     }
 
@@ -132,22 +117,9 @@ public class DominoPlayer : NetworkBehaviour
     public void RpcShowDominoes(GameObject domino)
     {
         NetworkDebugger.OutputAuthority(this, nameof(RpcShowDominoes));
-        var dominoEntity = domino.GetComponent<DominoEntity>();
-        dominoEntity.UpdateDominoLabels();
 
-        if (hasAuthority)
-        {
-            var mover = domino.GetComponent<Mover>();
-            domino.transform.position = new Vector3(0, 0, 0);
-
-            // animate the movement for the current player
-            StartCoroutine(mover.MoveOverSeconds(playerBottomCenter, 0.5f, 0));
-        }
-        else
-        {
-            // TODO: no longer render the other player's dominoes
-            domino.transform.position = playerTopCenter;
-        }
+        var gameSession = FindObjectOfType<GameSession>();
+        gameSession.MovePlayerDomino(domino, hasAuthority);
     }
 
 

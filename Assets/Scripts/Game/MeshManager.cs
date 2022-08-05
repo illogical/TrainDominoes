@@ -153,7 +153,6 @@ namespace Assets.Scripts.Game
 
         public void CreateMesh(DominoEntity domino)
         {
-            domino.UpdateDominoLabels();
             var newMesh = Instantiate(DominoMesh, DominoMesh.transform.position, DominoMesh.transform.rotation, Player);
             // TODO: check if this one already exists? Change this method to GetOrCreateMesh()
             newMesh.name = domino.ID.ToString();

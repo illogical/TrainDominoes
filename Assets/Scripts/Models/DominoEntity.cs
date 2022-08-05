@@ -14,21 +14,6 @@ namespace Assets.Scripts.Models
         [SyncVar(hook = nameof(OnFlippedChanged))]
         public bool Flipped;
 
-        public void UpdateDominoLabels()
-        {
-            var labels = gameObject.GetComponentsInChildren<TextMeshPro>();
-
-            if (Flipped)
-            {
-                labels[1].SetText(BottomScore.ToString());
-                labels[2].SetText(TopScore.ToString());
-                return;
-            }
-
-            labels[1].SetText(TopScore.ToString());
-            labels[2].SetText(BottomScore.ToString());
-        }
-
         public void OnTopScoreChanged(int oldValue, int newValue)
         {
             //if (!hasAuthority) { return; }

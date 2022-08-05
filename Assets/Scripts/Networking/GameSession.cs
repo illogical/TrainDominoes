@@ -16,9 +16,9 @@ public class GameSession : NetworkBehaviour
 
     private Quaternion dominoRotation = Quaternion.Euler(new Vector3(-90, 0, 180));
 
-    private Vector3 playerTopCenter = new Vector3(0, 1.07f, -9.87f);
-    private Vector3 playerBottomCenter = new Vector3(0, 0.93f, -9.87f);
-    private Vector3 tablePosition = new Vector3(0, 1, -9.8f);
+    private Vector3 playerTopCenter = new Vector3(0, 0.095f, -9.7f);
+    private Vector3 playerBottomCenter = new Vector3(0, -0.095f, -9.7f);
+    private Vector3 tablePosition = new Vector3(0, 0, -9.7f);
 
     private GameObject tableDomino;
 
@@ -158,12 +158,12 @@ public class GameSession : NetworkBehaviour
     {
         var dominoInfo = GetNextDomino();
 
-        var newDomino = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
+        var newDomino = GetNewDomino();
         var dom = tableDomino.GetComponent<DominoEntity>();
         // TODO: move this to when the server creates the instance
         dom.ID = dominoInfo.ID;
-        dom.TopScore = dominoInfo.ID;
-        dom.BottomScore = dominoInfo.ID;
+        dom.TopScore = dominoInfo.TopScore;
+        dom.BottomScore = dominoInfo.BottomScore;
 
         NetworkServer.Spawn(newDomino, connectionToClient);
         //AddPlayerDomino(newDomino);
@@ -191,9 +191,6 @@ public class GameSession : NetworkBehaviour
     [ClientRpc]
     public void RpcShowDominoes(GameObject domino)
     {
-        var dominoEntity = domino.GetComponent<DominoEntity>();
-        dominoEntity.UpdateDominoLabels();
-
         if (hasAuthority)
         {
             var mover = domino.GetComponent<Mover>();
@@ -213,14 +210,30 @@ public class GameSession : NetworkBehaviour
     public void RpcShowTableDominoes(GameObject domino)
     {
         NetworkDebugger.OutputAuthority(this, nameof(RpcShowTableDominoes), true);
-        var dominoEntity = domino.GetComponent<DominoEntity>();
-        dominoEntity.UpdateDominoLabels();
 
         var mover = domino.GetComponent<Mover>();
-        domino.transform.position = tablePosition;//Vector3.zero;
+        domino.transform.position = tablePosition;  // TODO: slide in from elsewhere
         // TODO: why does this animation only work on the client that is the server? Probably because it has authority.
         StartCoroutine(mover.MoveOverSeconds(tablePosition, 0.5f, 0));       //domino.transform.position += new Vector3(0, 1, -9.8f);
     }
 
     #endregion Client
+
+
+    public void MovePlayerDomino(GameObject domino, bool hasAuthority)
+    {
+        if (hasAuthority)
+        {
+            var mover = domino.GetComponent<Mover>();
+            domino.transform.position = new Vector3(0, 0, 0);
+
+            // animate the movement for the current player
+            StartCoroutine(mover.MoveOverSeconds(playerBottomCenter, 0.5f, 0));
+        }
+        else
+        {
+            // TODO: no longer render the other player's dominoes
+            domino.transform.position = playerTopCenter;
+        }
+    }
 }

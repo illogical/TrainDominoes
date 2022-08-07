@@ -1,4 +1,5 @@
 using Assets.Scripts.Game;
+using Assets.Scripts.Helpers;
 using Assets.Scripts.Models;
 using Mirror;
 using System.Collections.Generic;
@@ -10,6 +11,7 @@ public class GameSession : NetworkBehaviour
 {
     [SerializeField] private GameObject dominoPrefab = null;
 
+    private int dominoCount = 12;
     private DominoPlayer dominoPlayer;  // TODO: reference to current local player might be convenient
     private Dictionary<int, DominoInfo> dominoData = new Dictionary<int, DominoInfo>();
     private List<int> availableDominoes = new List<int>();  // TODO: ensure the clients don't have this list
@@ -24,7 +26,9 @@ public class GameSession : NetworkBehaviour
 
     private bool gameStarted = false;
 
-    public DominoTracker Dominoes = new DominoTracker();
+    public LayoutManager LayoutManager = null;
+    [HideInInspector]
+    public DominoTracker DominoTracker = new DominoTracker();
 
 
     private void Start()
@@ -55,15 +59,10 @@ public class GameSession : NetworkBehaviour
 
         if (isServer)
         {
-            //CreateFakeDominoes();
-            Dominoes.CreateDominoSet();
+            DominoTracker.CreateDominoSet();
+
+            //AddPlayerDominoes(dominoCount);
         }
-
-
-        // TODO: how to create a table domino?
-        //var firstDomino = GetNextDomino();
-        //NetworkServer.Spawn(firstDomino);
-        //RpcShowTableDominoes(firstDomino);
     }
 
 
@@ -76,41 +75,6 @@ public class GameSession : NetworkBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    [Server]
-    private void CreateFakeDominoes()
-    {
-        for (int i = 0; i < 10; i++)
-        {
-            //GameObject dominoInstance = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
-            //dominoInstance.GetComponent<DominoEntity>();        
-            //var dominoEntity = new DominoEntity()
-            //{ 
-            //    ID = i + 1,
-            //    TopScore = i + 1,
-            //    BottomScore = i + 1
-            //};
-
-            //var dominoInstance = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
-            //var dominoEntity = dominoInstance.GetComponent<DominoEntity>();
-            var score = i + 1;
-            var dominoInfo = new DominoInfo()
-            {
-                ID = score,
-                TopScore = score,
-                BottomScore = score,
-            };
-            
-            //dominoEntity.ID = score;
-            //dominoEntity.TopScore = score;
-            //dominoEntity.BottomScore = score;
-
-            dominoData.Add(i, dominoInfo);
-            availableDominoes.Add(i);
-        }
-    }
-
-
-    // TODO: use these instead of using DominoPlayer
     [Server]
     public DominoInfo GetNextDomino()
     {
@@ -130,15 +94,27 @@ public class GameSession : NetworkBehaviour
     }
 
     [Server]
-    public GameObject GetNewDomino()   // TODO: pass int to determine how many dominoes to create. Need this for StartGame()
+    public GameObject GetNewPlayerDomino()
     {
-        var dominoInfo = Dominoes.GetDominoFromBonePile();
+        var dominoInfo = DominoTracker.GetDominoFromBonePile();
+        return CreateDominoFromInfo(dominoInfo, playerBottomCenter);
+    }
 
-        var newDomino = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
+    [Server]
+    public GameObject GetNewEngineDomino()
+    {
+        var dominoInfo = DominoTracker.GetNextEngine();
+        return CreateDominoFromInfo(dominoInfo, Vector3.zero);
+    }
+
+    [Server]
+    public GameObject CreateDominoFromInfo(DominoInfo info, Vector3 postion)         // TODO: move to MeshManager
+    {
+        var newDomino = Instantiate(dominoPrefab, postion, dominoRotation);
         var dom = newDomino.GetComponent<DominoEntity>();
-        dom.ID = dominoInfo.ID;
-        dom.TopScore = dominoInfo.TopScore;
-        dom.BottomScore = dominoInfo.BottomScore;
+        dom.ID = info.ID;
+        dom.TopScore = info.TopScore;
+        dom.BottomScore = info.BottomScore;
 
         return newDomino;
     }
@@ -146,19 +122,19 @@ public class GameSession : NetworkBehaviour
     [Server]
     public void CreateTableDomino()
     {
-        tableDomino = GetNewDomino();
+        tableDomino = GetNewEngineDomino();
         NetworkServer.Spawn(tableDomino);
 
         RpcShowTableDominoes(tableDomino);
     }
 
     //[Command(requiresAuthority = false)]
-    [Command] // runs on server but is called by client
-    public void CmdDealDomino()
+    [Command] // reminder: runs on server but is called by client
+    public void CmdDealDominoes()
     {
         var dominoInfo = GetNextDomino();
 
-        var newDomino = GetNewDomino();
+        var newDomino = GetNewPlayerDomino();
         var dom = tableDomino.GetComponent<DominoEntity>();
         // TODO: move this to when the server creates the instance
         dom.ID = dominoInfo.ID;
@@ -201,9 +177,52 @@ public class GameSession : NetworkBehaviour
         }
         else
         {
-            // TODO: no longer render the other player's dominoes
+            // TODO: no longer render the other player's dominoes. May want to use TargetRpc instead and check for isLocalPlayer before executing it and passing connectionToClient to it.
             domino.transform.position = playerTopCenter;
         }
+    }
+
+    [ClientRpc]
+    public void RpcShowDominoes(List<GameObject> dominoes)
+    {
+        NetworkDebugger.OutputAuthority(this, nameof(RpcShowDominoes));
+
+        LayoutManager.StartGame(dominoes);
+
+        for (int i = 0; i < dominoes.Count; i++)
+        {
+            MovePlayerDomino(dominoes[i], i, hasAuthority);
+        }
+    }
+
+    /// <summary>
+    /// Adds multiple dominoes to a hand for starting the game.
+    /// </summary>
+    /// <param name="dominoCount"></param>
+    [Server]
+    public void AddPlayerDominoes(int dominoCount)
+    {
+        var newDominoes = new List<GameObject>();
+
+        for (int i = 0; i < dominoCount; i++)
+        {
+            var freshDomino = GetNewPlayerDomino();
+            NetworkServer.Spawn(freshDomino, connectionToClient);    // TODO: will connectionToClient be null if this is sent from GameSession?
+            
+            // TODO: need to add domino to DominoPlayer for localPlayer
+            if(isLocalPlayer)
+            {
+                //AddPlayerDomino(freshDomino);
+            }
+
+            newDominoes.Add(freshDomino);
+        }
+
+        // TODO: get current player and add dominoes
+        //DominoPlayer player = connectionToClient.identity.GetComponent<DominoPlayer>(); // TODO: will connectionToClient be null if this is sent from GameSession?
+        //player.AddPlayerDominoes(newDominoes);
+
+        //RpcShowDominoes(newDominoes);
     }
 
     [ClientRpc]
@@ -212,7 +231,9 @@ public class GameSession : NetworkBehaviour
         NetworkDebugger.OutputAuthority(this, nameof(RpcShowTableDominoes), true);
 
         var mover = domino.GetComponent<Mover>();
+        // TODO: use LayoutManager to move to left side of screen
         domino.transform.position = tablePosition;  // TODO: slide in from elsewhere
+
         // TODO: why does this animation only work on the client that is the server? Probably because it has authority.
         StartCoroutine(mover.MoveOverSeconds(tablePosition, 0.5f, 0));       //domino.transform.position += new Vector3(0, 1, -9.8f);
     }
@@ -220,12 +241,12 @@ public class GameSession : NetworkBehaviour
     #endregion Client
 
 
-    public void MovePlayerDomino(GameObject domino, bool hasAuthority)
+    public void MovePlayerDomino(GameObject domino, int index, bool hasAuthority)
     {
         if (hasAuthority)
         {
             var mover = domino.GetComponent<Mover>();
-            domino.transform.position = new Vector3(0, 0, 0);
+            domino.transform.position = new Vector3(0, 0, 0);   // TODO: get next position based upon index in ObjectGroup
 
             // animate the movement for the current player
             StartCoroutine(mover.MoveOverSeconds(playerBottomCenter, 0.5f, 0));
@@ -235,5 +256,34 @@ public class GameSession : NetworkBehaviour
             // TODO: no longer render the other player's dominoes
             domino.transform.position = playerTopCenter;
         }
+    }
+
+    public void MovePlayerDominoes(List<GameObject> dominoes, bool hasAuthority)
+    {
+        if(hasAuthority)
+        {
+            LayoutManager.LayoutPlayerDominoes(dominoes);
+        }
+        else
+        {
+            foreach(var domino in dominoes)
+            {
+                domino.transform.position = playerTopCenter;
+            }
+        }
+
+        //if (hasAuthority)
+        //{
+        //    var mover = domino.GetComponent<Mover>();
+        //    domino.transform.position = new Vector3(0, 0, 0);   // TODO: get next position based upon index in ObjectGroup
+
+        //    // animate the movement for the current player
+        //    StartCoroutine(mover.MoveOverSeconds(playerBottomCenter, 0.5f, 0));
+        //}
+        //else
+        //{
+        //    // TODO: no longer render the other player's dominoes
+        //    domino.transform.position = playerTopCenter;
+        //}
     }
 }

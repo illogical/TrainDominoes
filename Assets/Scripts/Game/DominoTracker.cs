@@ -9,9 +9,10 @@ namespace Assets.Scripts.Game
     public class DominoTracker
     {
         public Dictionary<int, DominoInfo> AllDominoes = new Dictionary<int, DominoInfo>();
-        private List<int> availableDominoes = new List<int>();
 
+        private List<int> availableDominoes = new List<int>();
         private List<int> engineIndices = new List<int>();
+        private int engineIndex = 0;
 
         private const int maxDots = 12;
 
@@ -37,22 +38,12 @@ namespace Assets.Scripts.Game
                     index++;
                 }
             }
-
-            engineIndices.Reverse();
         }
 
-        //public DominoInfo GetNextDomino()
-        //{
-        //    if (availableDominoes.Count == 0)
-        //    {
-        //        Debug.LogError("Server is out of dominoes");
-        //    }
-        //    var nextDominoEntity = AllDominoes[availableDominoes[0]];
-        //    availableDominoes.RemoveAt(0);
-
-
-        //    return nextDominoEntity;
-        //}
+        public DominoInfo GetDominoByID(int id)
+        {
+            return AllDominoes[id];
+        }
 
         public DominoInfo GetDominoFromBonePile()
         {
@@ -62,6 +53,14 @@ namespace Assets.Scripts.Game
 
             availableDominoes.RemoveAt(randomDominoIndex);
             return domino;
+        }
+
+        public DominoInfo GetNextEngine()
+        {
+            var engine = AllDominoes[engineIndices[engineIndex++]];
+            availableDominoes.Remove(engine.ID);    // no longer available to pick up
+
+            return engine;
         }
 
         private DominoInfo createDomino(int topScore, int bottomScore, int index)

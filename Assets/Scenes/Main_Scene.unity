@@ -1066,6 +1066,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1199748838697998528, guid: 8015a3d21ddef2345a7d0eccfa47b4f0, type: 3}
+      propertyPath: LayoutManager
+      value: 
+      objectReference: {fileID: 1442959920}
     - target: {fileID: 1199748838697998529, guid: 8015a3d21ddef2345a7d0eccfa47b4f0, type: 3}
       propertyPath: sceneId
       value: 903690142
@@ -1120,6 +1124,33 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8015a3d21ddef2345a7d0eccfa47b4f0, type: 3}
+--- !u!1 &1442959919 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1199748838697998531, guid: 8015a3d21ddef2345a7d0eccfa47b4f0, type: 3}
+  m_PrefabInstance: {fileID: 1442959918}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1442959920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1442959919}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6084fecf577987040b550e9cd5b48b05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BottomYOffset: 0
+  SelectionEase:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  SelectionDuration: 0.3
+  MainCamera: {fileID: 1890532539}
+  DominoPrefab: {fileID: 3325560248140386328, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
 --- !u!1 &1691172395
 GameObject:
   m_ObjectHideFlags: 0

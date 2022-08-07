@@ -11,7 +11,7 @@ public class DominoPlayer : NetworkBehaviour
     private bool isPartyOwner = false;
     [SyncVar(hook = nameof(ClientHandleDisplayNameUpdated))]
     private string displayName;
-    [SerializeField] private List<GameObject> myDominoes = new List<GameObject>(); // TODO: Not sure if DominoEntity needs to be a NetworkBehviour
+    [SerializeField] private List<GameObject> myDominoes = new List<GameObject>(); 
 
     public static event Action ClientOnInfoUpdated;
     public static event Action<bool> AuthorityOnPartyOwnerStateUpdated;
@@ -20,10 +20,6 @@ public class DominoPlayer : NetworkBehaviour
 
     public bool GetIsPartyOwner() => isPartyOwner;
     public string GetDisplayName() => displayName;
-
-    // TODO: Move this logic elsewhere
-    private Vector3 playerTopCenter = new Vector3(0, 0.095f, -9.7f);
-    private Vector3 playerBottomCenter = new Vector3(0, -0.095f, -9.7f);
 
     public void AddPlayerDomino(GameObject domino)
     {
@@ -64,6 +60,22 @@ public class DominoPlayer : NetworkBehaviour
         displayName = name;
     }
 
+    [Server]
+    public void AddPlayerDominoes(List<GameObject> playerDominoes)
+    {
+        foreach (var domino in playerDominoes)
+        {
+            NetworkServer.Spawn(domino, connectionToClient);
+
+            if (isLocalPlayer)
+            {
+                AddPlayerDomino(domino);
+            }
+        }
+
+        RpcShowDominoes(playerDominoes);
+    }
+
     #endregion
 
 
@@ -101,25 +113,61 @@ public class DominoPlayer : NetworkBehaviour
         ClientOnInfoUpdated?.Invoke();
     }
 
+    // TODO: Ideally DominoPlayer never should refer to GameSession. GameSession should call DominoPlayer for simple things such as getting/storing domino IDs however authority works best from here.
+
+    /// <summary>
+    /// Adds a single domino to a hand.
+    /// </summary>
     [Command]
     public void CmdAddPlayerDomino()
     {
-        // TODO: pretending that GameSession becomes a singleton, maybe this should call it instead of the other way around?
         var gameSession = FindObjectOfType<GameSession>();
-        var freshDomino = gameSession.GetNewDomino();
+        var freshDomino = gameSession.GetNewPlayerDomino();
 
         NetworkServer.Spawn(freshDomino, connectionToClient);    // TODO: will connectionToClient be null if this is sent from GameSession?
         AddPlayerDomino(freshDomino);
-        RpcShowDominoes(freshDomino);
+        RpcShowDominoes(new List<GameObject>() { freshDomino });
+    }
+
+    /// <summary>
+    /// Adds multiple dominoes to a hand for starting the game.
+    /// </summary>
+    /// <param name="dominoCount"></param>
+    [Command]
+    public void CmdAddPlayerDominoes(int dominoCount)
+    {
+        var gameSession = FindObjectOfType<GameSession>();
+        var newDominoes = new List<GameObject>();
+
+        for (int i = 0; i < dominoCount; i++)
+        {
+            var freshDomino = gameSession.GetNewPlayerDomino();
+            NetworkServer.Spawn(freshDomino, connectionToClient);
+
+            if (isLocalPlayer)
+            {
+                AddPlayerDomino(freshDomino);
+            }
+
+            newDominoes.Add(freshDomino);
+        }
+
+        RpcShowDominoes(newDominoes);
     }
 
     [ClientRpc]
-    public void RpcShowDominoes(GameObject domino)
+    public void RpcShowDominoes(List<GameObject> dominoes)
     {
         NetworkDebugger.OutputAuthority(this, nameof(RpcShowDominoes));
 
         var gameSession = FindObjectOfType<GameSession>();
-        gameSession.MovePlayerDomino(domino, hasAuthority);
+        gameSession.MovePlayerDominoes(dominoes, hasAuthority);
+
+
+        //for (int i = 0; i < dominoes.Count; i++)
+        //{
+        //    gameSession.MovePlayerDomino(dominoes[i], i, hasAuthority);
+        //}
     }
 
 

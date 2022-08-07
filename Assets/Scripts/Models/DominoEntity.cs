@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.Interfaces;
 using Mirror;
 using TMPro;
+using UnityEngine;
 
 namespace Assets.Scripts.Models
 {
@@ -14,47 +15,52 @@ namespace Assets.Scripts.Models
         [SyncVar(hook = nameof(OnFlippedChanged))]
         public bool Flipped;
 
+        [SerializeField] private TextMeshPro topText;
+        [SerializeField] private TextMeshPro bottomText;
+
+        public void OnValidate()
+        {
+            // when initialized to 0, the hook does not fire if the value is set to 0
+            TopScore = -1;
+            BottomScore = -1;
+        }
+
         public void OnTopScoreChanged(int oldValue, int newValue)
         {
             //if (!hasAuthority) { return; }
-
-            var labels = gameObject.GetComponentsInChildren<TextMeshPro>();
             if (Flipped)
             {
-                labels[2].SetText(newValue.ToString());
+                bottomText.SetText(newValue.ToString());
                 return;
             }
 
-            labels[1].SetText(newValue.ToString());
+            topText.SetText(newValue.ToString());
         }
 
         public void OnBottomScoreChanged(int oldValue, int newValue)
         {
             //if (!hasAuthority) { return; }
 
-            var labels = gameObject.GetComponentsInChildren<TextMeshPro>();
             if (Flipped)
             {
-                labels[1].SetText(newValue.ToString());
+                topText.SetText(newValue.ToString());
                 return;
             }
 
-            labels[2].SetText(newValue.ToString());
+            bottomText.SetText(newValue.ToString());
         }
 
         public void OnFlippedChanged(bool oldValue, bool newValue)
         {
-            var labels = gameObject.GetComponentsInChildren<TextMeshPro>();
-
             if (newValue)
             {
-                labels[1].SetText(BottomScore.ToString());
-                labels[2].SetText(TopScore.ToString());
+                topText.SetText(BottomScore.ToString());
+                bottomText.SetText(TopScore.ToString());
                 return;
             }
 
-            labels[1].SetText(TopScore.ToString());
-            labels[2].SetText(BottomScore.ToString());
+            topText.SetText(TopScore.ToString());
+            bottomText.SetText(BottomScore.ToString());
         }
 
         public void SwapAuthority()

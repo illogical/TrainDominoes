@@ -12,8 +12,10 @@ public class DrawDominoes : NetworkBehaviour
         // this had worked before trying to run this same command from a GameSession object
         NetworkIdentity identity = NetworkClient.connection.identity;
         var dominoPlayer = identity.GetComponent<DominoPlayer>();
-        dominoPlayer.CmdAddPlayerDomino();
+        //dominoPlayer.CmdAddPlayerDomino();
 
+        // TODO: how to instead call GameSession? Keep in mind that the clients do not have authority over GameSession (it exists in the sceen prior to game start)
+        dominoPlayer.CmdAddPlayerDominoes(12);
 
         // the button is owned by the server. Does that have anything to do with my challenges?
 

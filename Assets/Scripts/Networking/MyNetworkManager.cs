@@ -8,9 +8,7 @@ using UnityEngine.SceneManagement;
 
 public class MyNetworkManager : NetworkManager
 {
-    [SerializeField] private GameObject dominoPrefab = null;
     [SerializeField] private GameOverHandler gameOverHandler = null;
-    //[SerializeField] private GameSession gameSessionPrefab = null;            // TODO: does this need to be a SyncVar??
 
     public bool IsGameInProgress = false;
     public List<DominoPlayer> Players = new List<DominoPlayer>();
@@ -19,38 +17,6 @@ public class MyNetworkManager : NetworkManager
     public static event Action ClientOnDisconnected;
 
     public void SetTransport(Transport t) => transport = t;
-
-    // TODO: move this to GameManager when GameManager is ready to be used
-    private Quaternion dominoRotation = Quaternion.Euler(new Vector3(-90, 0, 180));
-
-    // TODO: move this to GameManager when GameManager is ready to be used
-    private List<GameObject> allDominoes = new List<GameObject>();
-    //private int currentDominoIndex = 0;
-    private Vector3 middle = new Vector3(0, 1.02f, -9.87f);
-
-    private DominoTracker dominoTracker = new DominoTracker();
-
-
-    public List<GameObject> GetDominoes() => allDominoes;
-    public GameObject GetNextDomino()
-    {
-        var nextDominoEntity = dominoTracker.GetDominoFromBonePile();
-        
-        // TODO: move the mesh creation to a MeshManager. How can the mesh manager decide where to position this?
-        GameObject dominoInstance = Instantiate(dominoPrefab, Vector3.zero, dominoRotation);
-        var dom = dominoInstance.GetComponent<DominoEntity>();
-        dom.ID = nextDominoEntity.ID;
-        dom.TopScore = nextDominoEntity.ID;
-        dom.BottomScore = nextDominoEntity.ID;
-
-        return dominoInstance;
-
-        //int nextIndex = currentDominoIndex;
-        //currentDominoIndex = Mathf.Clamp(currentDominoIndex + 1, 0, allDominoes.Count - 1);
-
-        //return allDominoes[nextIndex];
-    }
-
 
     #region Server
 

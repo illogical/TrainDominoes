@@ -47,7 +47,7 @@ namespace Assets.Scripts.Game
 
         public DominoInfo GetDominoFromBonePile()
         {
-            int randomDominoIndex = UnityEngine.Random.Range(0, availableDominoes.Count);
+            int randomDominoIndex = UnityEngine.Random.Range(0, availableDominoes.Count); // TODO: could do a single shuffle instead
             int dominoID = availableDominoes[randomDominoIndex];
             var domino = AllDominoes[dominoID];
 

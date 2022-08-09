@@ -12,15 +12,14 @@ public class GameSession : NetworkBehaviour
     [SerializeField] private GameObject dominoPrefab = null;
 
     private int dominoCount = 12;
-    private DominoPlayer dominoPlayer;  // TODO: reference to current local player might be convenient
     private Dictionary<int, DominoInfo> dominoData = new Dictionary<int, DominoInfo>();
     private List<int> availableDominoes = new List<int>();  // TODO: ensure the clients don't have this list
 
     private Quaternion dominoRotation = Quaternion.Euler(new Vector3(-90, 0, 180));
 
-    private Vector3 playerTopCenter = new Vector3(0, 0.095f, -9.7f);
-    private Vector3 playerBottomCenter = new Vector3(0, -0.095f, -9.7f);
-    private Vector3 tablePosition = new Vector3(0, 0, -9.7f);
+    private Vector3 playerTopCenter = new Vector3(0, 0.08f, 0);
+    private Vector3 playerBottomCenter = new Vector3(0, -0.08f, 0);
+    private Vector3 tablePosition = new Vector3(0, 0, 0);
 
     private GameObject tableDomino;
 
@@ -108,9 +107,9 @@ public class GameSession : NetworkBehaviour
     }
 
     [Server]
-    public GameObject CreateDominoFromInfo(DominoInfo info, Vector3 postion)         // TODO: move to MeshManager
+    public GameObject CreateDominoFromInfo(DominoInfo info, Vector3 position)         // TODO: move to MeshManager
     {
-        var newDomino = Instantiate(dominoPrefab, postion, dominoRotation);
+        var newDomino = Instantiate(dominoPrefab, position, dominoRotation);
         var dom = newDomino.GetComponent<DominoEntity>();
         dom.ID = info.ID;
         dom.TopScore = info.TopScore;

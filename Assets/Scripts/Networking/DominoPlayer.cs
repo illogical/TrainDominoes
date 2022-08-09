@@ -113,8 +113,6 @@ public class DominoPlayer : NetworkBehaviour
         ClientOnInfoUpdated?.Invoke();
     }
 
-    // TODO: Ideally DominoPlayer never should refer to GameSession. GameSession should call DominoPlayer for simple things such as getting/storing domino IDs however authority works best from here.
-
     /// <summary>
     /// Adds a single domino to a hand.
     /// </summary>
@@ -142,6 +140,8 @@ public class DominoPlayer : NetworkBehaviour
         for (int i = 0; i < dominoCount; i++)
         {
             var freshDomino = gameSession.GetNewPlayerDomino();
+
+            // TODO: only do this if isLocalPlayer otherwise current player could see other player's domineos
             NetworkServer.Spawn(freshDomino, connectionToClient);
 
             if (isLocalPlayer)
@@ -152,6 +152,7 @@ public class DominoPlayer : NetworkBehaviour
             newDominoes.Add(freshDomino);
         }
 
+        // TODO: can this only run on the the local player? isLocalPlayer causes client to not line up any dominoes for themselves
         RpcShowDominoes(newDominoes);
     }
 
@@ -168,6 +169,15 @@ public class DominoPlayer : NetworkBehaviour
         //{
         //    gameSession.MovePlayerDomino(dominoes[i], i, hasAuthority);
         //}
+    }
+
+    [TargetRpc]
+    public void RpcShowDominoes(NetworkConnection conn, List<GameObject> dominoes)
+    {
+        NetworkDebugger.OutputAuthority(this, nameof(RpcShowDominoes));
+
+        var gameSession = FindObjectOfType<GameSession>();
+        gameSession.MovePlayerDominoes(dominoes, hasAuthority);
     }
 
 

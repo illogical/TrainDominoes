@@ -16,6 +16,7 @@ namespace Assets.Scripts.Game
     {
         [Range(0, 2)]
         public float BottomYOffset;
+        public float BottomSideMargin = 0.01f;
         [Space]
         public AnimationCurve SelectionEase;
         public float SelectionDuration = 0.3f;
@@ -64,10 +65,10 @@ namespace Assets.Scripts.Game
             }
         }
 
-        public void LayoutPlayerDominoes(List<GameObject> playerDominoes, float sideMargin = 0f)
+        public void LayoutPlayerDominoes(List<GameObject> playerDominoes)
         {
             Vector3 screenBottomPos = PositionHelper.GetScreenBottomCenterPositionForObject(playerDominoes[0], MainCamera, 0);
-            PositionHelper.LayoutAcrossScreen(playerDominoes, MainCamera, screenBottomPos.y, sideMargin);
+            PositionHelper.LayoutAcrossScreen(playerDominoes, MainCamera, screenBottomPos.y, BottomSideMargin);
         }
 
 
@@ -78,11 +79,6 @@ namespace Assets.Scripts.Game
             foreach (var domino in playerDominoes)
             {
                 newGroup.Add(domino.name, domino);
-
-                //if (horizontal)
-                //{
-                //    domino.transform.rotation = Quaternion.Euler(0, 0, -90);
-                //}
             }
 
             return newGroup;

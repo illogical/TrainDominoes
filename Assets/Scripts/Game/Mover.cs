@@ -8,15 +8,11 @@ public class Mover : MonoBehaviour
 {
     [SerializeField] private AnimationCurve animationCurve;
 
-    // TODO: use PositionHelper to move dominoes to the correct positions
-
-    // TODO: pass in the location instead of the index
     public IEnumerator DealDomino(Vector3 destination)
     {
         yield return StartCoroutine(MoveOverSeconds(destination, 0.5f, 0));
 
         //var objectSize = PositionHelper.GetObjectDimensions(this.gameObject);
-
         //var positions = PositionHelper.GetLayoutAcrossScreen(objectSize, camera, totalDominoesInRow, sideMargin);
 
         //PositionHelper.LayoutAcrossAndUnderScreen(gameObjects, mainCamera, sideMargin);
@@ -76,5 +72,16 @@ public class Mover : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         transform.rotation = rotationAmount;
+    }
+
+    public IEnumerator SlideToPosition(Transform objectTransform, Vector3 endPos, float duration, float delay, AnimationCurve curve)
+    {
+        if (objectTransform.position == endPos)
+        {
+            // skip objects that are already in place
+            yield break;
+        }
+
+        yield return StartCoroutine(AnimationHelper.MoveOverSeconds(objectTransform, endPos, duration, delay, curve));
     }
 }

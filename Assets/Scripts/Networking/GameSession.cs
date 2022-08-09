@@ -187,7 +187,7 @@ public class GameSession : NetworkBehaviour
     {
         NetworkDebugger.OutputAuthority(this, nameof(RpcShowDominoes));
 
-        LayoutManager.StartGame(dominoes);
+        LayoutManager.PlacePlayerDominoes(dominoes);
 
         for (int i = 0; i < dominoes.Count; i++)
         {
@@ -262,28 +262,16 @@ public class GameSession : NetworkBehaviour
     {
         if(hasAuthority)
         {
-            LayoutManager.StartGame(dominoes);
+            LayoutManager.PlacePlayerDominoes(dominoes);
         }
         else
         {
+            // TODO: remove this. Currently displays other player's dominoes for debugging purposes only
+
             foreach(var domino in dominoes)
             {
                 domino.transform.position = playerTopCenter;
             }
         }
-
-        //if (hasAuthority)
-        //{
-        //    var mover = domino.GetComponent<Mover>();
-        //    domino.transform.position = new Vector3(0, 0, 0);   // TODO: get next position based upon index in ObjectGroup
-
-        //    // animate the movement for the current player
-        //    StartCoroutine(mover.MoveOverSeconds(playerBottomCenter, 0.5f, 0));
-        //}
-        //else
-        //{
-        //    // TODO: no longer render the other player's dominoes
-        //    domino.transform.position = playerTopCenter;
-        //}
     }
 }

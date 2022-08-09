@@ -26,9 +26,9 @@ namespace Assets.Scripts.Game
 
         private BottomGroup bottomGroup;
 
-        public void StartGame(List<GameObject> playerDominoes) // TODO: maybe have GameSession/GameManager call this instead of starting on its own
+        public void PlacePlayerDominoes(List<GameObject> playerDominoes)
         {
-            LayoutPlayerDominoes(playerDominoes);   //place them outside of the camera's view to allow them to slide in
+            PositionHelper.LayoutAcrossAndUnderScreen(playerDominoes, MainCamera, BottomSideMargin);  //place them outside of the camera's view to allow them to slide in
 
             var objectSize = PositionHelper.GetObjectDimensions(playerDominoes[0]);
             var positions = PositionHelper.GetLayoutAcrossScreen(objectSize, MainCamera, playerDominoes.Count, BottomSideMargin);
@@ -40,7 +40,9 @@ namespace Assets.Scripts.Game
 
                 //mover.DealDomino(positions[i], LayoutManager.MainCamera, LayoutManager.BottomSideMargin);
                 //mover.DealDomino(positions[i]);
-                StartCoroutine(mover.MoveOverSeconds(positions[i], 0.5f, 0));
+                var staggerDelay = 0.02f * i;
+
+                StartCoroutine(mover.MoveOverSeconds(positions[i], 0.5f, staggerDelay));
             }
         }
 
@@ -73,16 +75,6 @@ namespace Assets.Scripts.Game
             }
         }
 
-        public void LayoutPlayerDominoes(List<GameObject> playerDominoes)
-        {
-            // TODO: how to animate? Animation needs done in update [on the server]
-            PositionHelper.LayoutAcrossAndUnderScreen(playerDominoes, MainCamera, BottomSideMargin);
-
-            //Vector3 screenBottomPos = PositionHelper.GetScreenBottomCenterPositionForObject(playerDominoes[0], MainCamera, 0);
-            //PositionHelper.LayoutAcrossScreen(playerDominoes, MainCamera, screenBottomPos.y, BottomSideMargin);
-        }
-
-
         ObjectGroup<GameObject> CreateBottomGroup(List<GameObject> playerDominoes)
         {
             var newGroup = new ObjectGroup<GameObject>();
@@ -93,14 +85,6 @@ namespace Assets.Scripts.Game
             }
 
             return newGroup;
-        }
-
-        // TODO: creating objects should not be done in LayoutManager. Would prefer passing in existing game object empties
-        GameObject CreateObject(GameObject original, Vector3 position, string name)
-        {
-            var dup = Instantiate(original, position, original.transform.rotation);
-            dup.name = name;
-            return dup;
         }
 
         /// <summary>

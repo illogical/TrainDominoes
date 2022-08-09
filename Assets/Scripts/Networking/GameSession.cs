@@ -14,6 +14,7 @@ public class GameSession : NetworkBehaviour
     private int dominoCount = 12;
     private Dictionary<int, DominoInfo> dominoData = new Dictionary<int, DominoInfo>();
     private List<int> availableDominoes = new List<int>();  // TODO: ensure the clients don't have this list
+    private List<GameObject> playerDominoes = new List<GameObject>();
 
     private Quaternion dominoRotation = Quaternion.Euler(new Vector3(-90, 0, 180));
 
@@ -261,7 +262,7 @@ public class GameSession : NetworkBehaviour
     {
         if(hasAuthority)
         {
-            LayoutManager.LayoutPlayerDominoes(dominoes);
+            LayoutManager.StartGame(dominoes);
         }
         else
         {

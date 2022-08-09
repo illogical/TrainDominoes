@@ -28,12 +28,20 @@ namespace Assets.Scripts.Game
 
         public void StartGame(List<GameObject> playerDominoes) // TODO: maybe have GameSession/GameManager call this instead of starting on its own
         {
-            Vector3 screenBottomPos = PositionHelper.GetScreenBottomCenterPositionForObject(DominoPrefab, MainCamera, 0);
+            LayoutPlayerDominoes(playerDominoes);   //place them outside of the camera's view to allow them to slide in
 
-            var bottomEmpty = Instantiate(new GameObject(), new Vector3(0, screenBottomPos.y + BottomYOffset, 0), Quaternion.identity);
-            bottomGroup = new BottomGroup(bottomEmpty);
+            var objectSize = PositionHelper.GetObjectDimensions(playerDominoes[0]);
+            var positions = PositionHelper.GetLayoutAcrossScreen(objectSize, MainCamera, playerDominoes.Count, BottomSideMargin);
 
-            Reset(playerDominoes);
+            for (int i = 0; i < playerDominoes.Count; i++)
+            {
+                var domino = playerDominoes[i];
+                var mover = domino.GetComponent<Mover>();
+
+                //mover.DealDomino(positions[i], LayoutManager.MainCamera, LayoutManager.BottomSideMargin);
+                //mover.DealDomino(positions[i]);
+                StartCoroutine(mover.MoveOverSeconds(positions[i], 0.5f, 0));
+            }
         }
 
         /// <summary>
@@ -67,8 +75,11 @@ namespace Assets.Scripts.Game
 
         public void LayoutPlayerDominoes(List<GameObject> playerDominoes)
         {
-            Vector3 screenBottomPos = PositionHelper.GetScreenBottomCenterPositionForObject(playerDominoes[0], MainCamera, 0);
-            PositionHelper.LayoutAcrossScreen(playerDominoes, MainCamera, screenBottomPos.y, BottomSideMargin);
+            // TODO: how to animate? Animation needs done in update [on the server]
+            PositionHelper.LayoutAcrossAndUnderScreen(playerDominoes, MainCamera, BottomSideMargin);
+
+            //Vector3 screenBottomPos = PositionHelper.GetScreenBottomCenterPositionForObject(playerDominoes[0], MainCamera, 0);
+            //PositionHelper.LayoutAcrossScreen(playerDominoes, MainCamera, screenBottomPos.y, BottomSideMargin);
         }
 
 

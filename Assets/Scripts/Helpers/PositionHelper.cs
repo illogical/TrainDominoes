@@ -158,27 +158,31 @@ namespace Assets.Scripts.Helpers
         public static void LayoutAcrossScreen(List<GameObject> objects, Camera camera, float yPos, float sideMargin) // TODO: margin is distance from sides of screen. Ideally should be percentages for smaller screens? or some cutoff at some point?
         {
             Vector3 objectSize = GetObjectDimensions(objects[0]);
-        float objectWidth = objectSize.x;
-        Vector2 screenSize = GetScreenSize(camera);
-        List<float> positions = GetPositionsSpreadAcrossLength(screenSize.x, objectWidth, objects.Count, sideMargin);
+            float objectWidth = objectSize.x;
+            Vector2 screenSize = GetScreenSize(camera);
+            List<float> positions = GetPositionsSpreadAcrossLength(screenSize.x, objectWidth, objects.Count, sideMargin);
 
             for (int i = 0; i<objects.Count; i++)
             {
                 objects[i].transform.position = new Vector3(positions[i], yPos, 0);
-    }
-}
-//public static void LayoutAcrossScreen(List<GameObject> objects, Camera camera, float yPos, float zPos, float sideMargin) // TODO: margin is distance from sides of screen. Ideally should be percentages for smaller screens? or some cutoff at some point?
-//        {
-//            Vector3 objectSize = GetObjectDimensions(objects[0]);
-//            float objectWidth = objectSize.x * 100; // 100 is the scale I used
-//            Vector2 screenSize = GetScreenSize(camera);
-//            List<float> positions = GetPositionsSpreadAcrossLength(screenSize.x, objectWidth, objects.Count, sideMargin);
+            }
+        }
 
-//            for (int i = 0; i < objects.Count; i++)
-//            {
-//                objects[i].transform.position = new Vector3(positions[i], yPos, zPos);
-//            }
-//        }
+        public static List<Vector3> GetLayoutAcrossScreen(Vector3 objectDimensions, Camera camera, int totalCount, float sideMargin)
+        {
+            Vector2 screenSize = GetScreenSize(camera);
+            List<float> xPositions = GetPositionsSpreadAcrossLength(screenSize.x, objectDimensions.x, totalCount, sideMargin);
+
+            Vector3 screenBottom = camera.ViewportToWorldPoint(new Vector3(0, 0, Mathf.Abs(camera.transform.position.z)));
+
+            var positions = new List<Vector3>();
+            foreach(var x in xPositions)
+            {
+                positions.Add(new Vector3(x, screenBottom.y + objectDimensions.y / 2, 0));
+            }
+
+            return positions;
+        }
 
         // TODO: begin using GetScreenBottomCenterPositionForObject() and provide a Y position
         public static void LayoutAcrossAndUnderScreen(List<GameObject> objects, Camera camera, float sideMargin)

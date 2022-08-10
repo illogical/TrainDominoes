@@ -42,7 +42,7 @@ public class InputManager : MonoBehaviour
     void MouseClickedObject(int id, PurposeType purpose)
     {
         // TODO: might need access to the parent object to know if this is a player or table domino
-        print($"Domino {id} ({purpose}) was clicked!");
+        Debug.Log($"Domino {id} ({purpose}) was clicked via InputManager");
         BottomObjectClicked.RaiseEvent(id);
     }
 }

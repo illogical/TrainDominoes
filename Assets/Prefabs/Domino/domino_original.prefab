@@ -654,6 +654,7 @@ MonoBehaviour:
   TopScore: -1
   BottomScore: -1
   Flipped: 0
+  Purpose: 0
   topText: {fileID: 2515166644304880907}
   bottomText: {fileID: 2515166644380815559}
 --- !u!114 &-7640438156410046427

@@ -30,12 +30,16 @@ public class GameSession : NetworkBehaviour
     [HideInInspector]
     public DominoTracker DominoTracker = new DominoTracker();
 
+    public SelectionEvent PlayerDominoSelected;
+
 
     private void Start()
     {
         //NetworkIdentity identity = NetworkClient.connection.identity;
         //dominoPlayer = identity.GetComponent<DominoPlayer>();
         //dominoPlayer.CmdDealDomino();
+
+        PlayerDominoSelected?.OnEventRaised.AddListener(HandlePlayerDominoClicked);
 
         StartGame();
     }
@@ -53,6 +57,11 @@ public class GameSession : NetworkBehaviour
         }
     }
 
+    private void OnDestroy()
+    {
+        PlayerDominoSelected?.OnEventRaised.RemoveListener(HandlePlayerDominoClicked);
+    }
+
     public void StartGame()
     {
         NetworkDebugger.OutputAuthority(this, nameof(StartGame), true);
@@ -65,6 +74,12 @@ public class GameSession : NetworkBehaviour
         }
     }
 
+    // TODO: introduce state machine soon because different states will subscribe to relevant events
+    public void HandlePlayerDominoClicked(int id)
+    {
+        // TODO: notice that this never has authority on client or server. Wtf?
+        NetworkDebugger.OutputAuthority(this, $"GameSession.{nameof(HandlePlayerDominoClicked)}", true);
+    }
 
     #region Server
 

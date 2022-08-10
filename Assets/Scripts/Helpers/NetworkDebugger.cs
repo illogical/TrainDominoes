@@ -9,7 +9,11 @@ public static class NetworkDebugger
     {
         StringBuilder output = new StringBuilder($"<b>{caller}</b> from ");
 
-        if (b.isServer)
+        if (b.isServer && b.isClient)
+        {
+            output.Append("<color=magenta>server</color> AND <color=green>client</color>");
+        }
+        else if(b.isServer)
         {
             output.Append("<color=magenta>server</color>");
         }

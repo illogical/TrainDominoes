@@ -7,6 +7,7 @@ namespace Assets.Scripts.Models
 {
     public class DominoEntity : NetworkBehaviour
     {
+        [SyncVar]
         public int ID;
         [SyncVar(hook = nameof(OnTopScoreChanged))]
         public int TopScore;

@@ -44,9 +44,9 @@ public class Mover : MonoBehaviour
         }
     }
 
-    public IEnumerator MoveOverSeconds(Vector3 endPos, float seconds, float delay)
+    public IEnumerator MoveOverSeconds(Vector3 endPos, float seconds, float delay, Action afterComplete = null)
     {
-        yield return new WaitForSeconds(delay);
+        yield return new WaitForSeconds(delay); // TODO: store in dictionary for performance's sake
 
         float elapsedTime = 0;
         var startPos = transform.position;
@@ -57,6 +57,11 @@ public class Mover : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         transform.position = endPos;
+
+        if (afterComplete != null)
+        {
+            afterComplete();
+        }
     }
 
     public IEnumerator RotateOverSeconds(Quaternion rotationAmount, float seconds, float delay)

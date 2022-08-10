@@ -113,13 +113,11 @@ namespace Assets.Scripts.Helpers
         /// <param name="camera">Current camera</param>
         /// <param name="destinationZ">Destination Z position</param>
         /// <returns></returns>
-        public static Vector3 GetScreenLeftCenterPositionForObject(GameObject gameObject, Camera camera, float destinationZ)
+        public static Vector3 GetScreenLeftCenterPositionForObject(Vector3 objectDimensions, Camera camera, float destinationZ)
         {
-            var objectSize = GetObjectDimensions(gameObject);
-
             // keep in mind that the face closest to the camera is half the depth closer than the center of the object)
-            var leftMiddleWithDepth = camera.ViewportToWorldPoint(new Vector3(0, 0.5f, Mathf.Abs(camera.transform.position.z) + destinationZ - (objectSize.z / 2)));
-            return new Vector3(leftMiddleWithDepth.x + objectSize.x / 2, leftMiddleWithDepth.y, destinationZ);
+            var leftMiddleWithDepth = camera.ViewportToWorldPoint(new Vector3(0, 0.5f, Mathf.Abs(camera.transform.position.z) + destinationZ - (objectDimensions.z / 2)));
+            return new Vector3(leftMiddleWithDepth.x + objectDimensions.x / 2, leftMiddleWithDepth.y, destinationZ);
         }
 
         /// <summary>

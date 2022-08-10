@@ -97,24 +97,27 @@ public class GameSession : NetworkBehaviour
     public GameObject GetNewPlayerDomino()
     {
         var dominoInfo = DominoTracker.GetDominoFromBonePile();
-        return CreateDominoFromInfo(dominoInfo, playerBottomCenter);
+        return CreateDominoFromInfo(dominoInfo, playerBottomCenter, PurposeType.Player);
     }
 
     [Server]
     public GameObject GetNewEngineDomino()
     {
         var dominoInfo = DominoTracker.GetNextEngine();
-        return CreateDominoFromInfo(dominoInfo, Vector3.zero);
+        return CreateDominoFromInfo(dominoInfo, Vector3.zero, PurposeType.Engine);
     }
 
     [Server]
-    public GameObject CreateDominoFromInfo(DominoInfo info, Vector3 position)         // TODO: move to MeshManager
+    public GameObject CreateDominoFromInfo(DominoInfo info, Vector3 position, PurposeType purpose)         // TODO: move to MeshManager
     {
         var newDomino = Instantiate(dominoPrefab, position, dominoRotation);
+        newDomino.name = info.ID.ToString();    // TODO: this only sets the name on the server
+
         var dom = newDomino.GetComponent<DominoEntity>();
         dom.ID = info.ID;
         dom.TopScore = info.TopScore;
         dom.BottomScore = info.BottomScore;
+        dom.Purpose = purpose;
 
         return newDomino;
     }
@@ -124,6 +127,10 @@ public class GameSession : NetworkBehaviour
     {
         tableDomino = GetNewEngineDomino();
         NetworkServer.Spawn(tableDomino);
+
+        // only happens on the server
+        //tableDomino.transform.position = tablePosition;
+        //LayoutManager.PlaceEngine(tableDomino);
 
         RpcShowTableDominoes(tableDomino);
     }
@@ -230,12 +237,20 @@ public class GameSession : NetworkBehaviour
     {
         NetworkDebugger.OutputAuthority(this, nameof(RpcShowTableDominoes), true);
 
-        var mover = domino.GetComponent<Mover>();
-        // TODO: use LayoutManager to move to left side of screen
-        domino.transform.position = tablePosition;  // TODO: slide in from elsewhere
+        var sideMargin = new Vector3(0.01f, 0, 0);
+        var destination = LayoutManager.GetEnginePosition(domino);  // TODO: how to handle each client having a different resolution? May need to use a canvas.
+        domino.transform.position = destination + sideMargin;
+        //var dom = tableDomino.GetComponent<DominoEntity>();
+
+        // TODO: both clients may need to measure separately (resolutions could differ per client)
+        // TODO: this only happens on the server's client [most of the time]. Why? Adding a NetworkTransform (with Sync Mode = Owner) to the domino prefab fixed this but then player dominoes were shared with both players so that can't work.
+        // wondering if this needs to run on clientconnect? I am thinking that a client could join after this was already in motion.
+        //domino.transform.position = Vector3.zero;
+        //LayoutManager.PlaceEngine(domino);
 
         // TODO: why does this animation only work on the client that is the server? Probably because it has authority.
-        StartCoroutine(mover.MoveOverSeconds(tablePosition, 0.5f, 0));       //domino.transform.position += new Vector3(0, 1, -9.8f);
+        // var mover = domino.GetComponent<Mover>();
+        //StartCoroutine(mover.MoveOverSeconds(tablePosition, 0.5f, 0));       //domino.transform.position += new Vector3(0, 1, -9.8f);
     }
 
     #endregion Client

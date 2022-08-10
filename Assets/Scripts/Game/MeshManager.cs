@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using static TMPro.TMP_InputField;
 
 namespace Assets.Scripts.Game
 {
@@ -57,7 +56,7 @@ namespace Assets.Scripts.Game
                     {                       
                         Debug.Log($"Domino {hit.transform.name} was clicked. Position = ({hit.transform.position.x}, {hit.transform.position.y}, {hit.transform.position.z})");
 
-                        DominoSelected?.Invoke(hit.transform.name);
+                        //DominoSelected?.RaiseEvent(hit.transform.name);
                     }
                 }
             }

@@ -15,6 +15,9 @@ namespace Assets.Scripts.Models
         [SyncVar(hook = nameof(OnFlippedChanged))]
         public bool Flipped;
 
+        [SyncVar]
+        public PurposeType Purpose;
+
         [SerializeField] private TextMeshPro topText;
         [SerializeField] private TextMeshPro bottomText;
 

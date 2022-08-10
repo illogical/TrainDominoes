@@ -23,6 +23,7 @@ namespace Assets.Scripts.Game
         [Space]
         public Camera MainCamera;
         public GameObject DominoPrefab;
+        public SelectionEvent PlayerDominoSelectedEvent;
 
         private BottomGroup bottomGroup;
 
@@ -44,6 +45,20 @@ namespace Assets.Scripts.Game
 
                 StartCoroutine(mover.MoveOverSeconds(positions[i], 0.5f, staggerDelay));
             }
+        }
+
+        public void PlaceEngine(GameObject engine, Action afterComplete = null)
+        {
+            var destination = GetEnginePosition(engine);
+
+            var mover = engine.GetComponent<Mover>();
+            StartCoroutine(mover.MoveOverSeconds(destination, 0.5f, 0, afterComplete));
+        }
+
+        public Vector3 GetEnginePosition(GameObject engine)
+        {
+            var objectSize = PositionHelper.GetObjectDimensions(engine);
+            return PositionHelper.GetScreenLeftCenterPositionForObject(objectSize, MainCamera, 0);
         }
 
         /// <summary>

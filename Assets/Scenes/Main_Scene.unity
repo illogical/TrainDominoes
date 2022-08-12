@@ -1072,6 +1072,14 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1442959920}
     - target: {fileID: 1199748838697998528, guid: 8015a3d21ddef2345a7d0eccfa47b4f0, type: 3}
+      propertyPath: tableDominoPrefab
+      value: 
+      objectReference: {fileID: 3325560248140386328, guid: 61f798073cab57040b191233c2577a5d, type: 3}
+    - target: {fileID: 1199748838697998528, guid: 8015a3d21ddef2345a7d0eccfa47b4f0, type: 3}
+      propertyPath: playerDominoPrefab
+      value: 
+      objectReference: {fileID: 3325560248140386328, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
+    - target: {fileID: 1199748838697998528, guid: 8015a3d21ddef2345a7d0eccfa47b4f0, type: 3}
       propertyPath: PlayerDominoSelected
       value: 
       objectReference: {fileID: 11400000, guid: eb6e070dec80a7e4c9b6bb90aebc81ea, type: 2}

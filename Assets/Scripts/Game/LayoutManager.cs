@@ -47,6 +47,14 @@ namespace Assets.Scripts.Game
             }
         }
 
+        public Vector3 GetPlayerDominoLinePosition()
+        {
+            var screenSize = PositionHelper.GetScreenSize(MainCamera);
+            var bottomCenter = new Vector3(screenSize.x, BottomYOffset, 0);
+
+            return bottomCenter;
+        }
+
         public void PlaceEngine(GameObject engine, Action afterComplete = null)
         {
             var destination = GetEnginePosition(engine);

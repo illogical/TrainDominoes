@@ -135,21 +135,11 @@ public class DominoPlayer : NetworkBehaviour
     public void CmdAddPlayerDominoes(int dominoCount)
     {
         var gameSession = FindObjectOfType<GameSession>();
-        var newDominoes = new List<GameObject>();
-
-        for (int i = 0; i < dominoCount; i++)
+        var newDominoes = gameSession.DealNewDominoes(dominoCount);
+        
+        if (isLocalPlayer)
         {
-            var freshDomino = gameSession.GetNewPlayerDomino();
-
-            // TODO: only do this if isLocalPlayer otherwise current player could see other player's domineos
-            NetworkServer.Spawn(freshDomino, connectionToClient);
-
-            if (isLocalPlayer)
-            {
-                AddPlayerDomino(freshDomino);
-            }
-
-            newDominoes.Add(freshDomino);
+            myDominoes.AddRange(newDominoes);
         }
 
         // TODO: can this only run on the the local player? isLocalPlayer causes client to not line up any dominoes for themselves
@@ -163,12 +153,6 @@ public class DominoPlayer : NetworkBehaviour
 
         var gameSession = FindObjectOfType<GameSession>();
         gameSession.MovePlayerDominoes(dominoes, hasAuthority);
-
-
-        //for (int i = 0; i < dominoes.Count; i++)
-        //{
-        //    gameSession.MovePlayerDomino(dominoes[i], i, hasAuthority);
-        //}
     }
 
     [TargetRpc]

@@ -11,6 +11,7 @@ public class GameSession : NetworkBehaviour
 {
     [SerializeField] private GameObject playerDominoPrefab = null;
     [SerializeField] private GameObject tableDominoPrefab = null;
+    [SerializeField] private GameObject playerPositionEmpty = null;
 
     private int dominoCount = 12;
     private Dictionary<int, DominoInfo> dominoData = new Dictionary<int, DominoInfo>();
@@ -107,6 +108,24 @@ public class GameSession : NetworkBehaviour
         availableDominoes.RemoveAt(0);
 
         return nextDominoEntity;
+    }
+
+    [Server]
+    public List<GameObject> DealNewDominoes(int dominoCount)
+    {
+        var newDominoes = new List<GameObject>();
+
+        for (int i = 0; i < dominoCount; i++)
+        {
+            var freshDomino = GetNewPlayerDomino();
+
+            // TODO: only do this if isLocalPlayer otherwise would spawn in all players' games??
+            NetworkServer.Spawn(freshDomino, connectionToClient);
+
+            newDominoes.Add(freshDomino);
+        }
+
+        return newDominoes;
     }
 
     [Server]

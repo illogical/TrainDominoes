@@ -7,25 +7,24 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace Assets.Scripts.Game
-{
-    // TODO: might want to pass in existing GameObject empties in the scene and use math to place them. Engine to the side center. Player's are x distance from the bottom. Train tracks stay centered on the left.
-    // TODO: GameObject empties for player positions maybe need to be NetworkBehaviour objects so that each player can move their's independently
-            // unless it plans to stay centered on the X position which I think is how it currently works
-    
+{    
     public class LayoutManager : MonoBehaviour
     {
         [Range(0, 2)]
-        public float BottomYOffset;
+        public float BottomYOffset = 0.01f;
         public float BottomSideMargin = 0.01f;
+        public float SelectionRaiseAmount = 0.02f;
         [Space]
         public AnimationCurve SelectionEase;
-        public float SelectionDuration = 0.3f;
+        public float SelectionDuration = 0.03f;
+        public float FlyInStaggerDelay = 0.02f;
         [Space]
         public Camera MainCamera;
         public GameObject DominoPrefab;
-        public SelectionEvent PlayerDominoSelectedEvent;
 
-        private BottomGroup bottomGroup;
+        private float playerYPosition = 0;
+
+        private BottomGroup bottomGroup;    // TODO: kill this
 
         public void PlacePlayerDominoes(List<GameObject> playerDominoes)
         {
@@ -34,14 +33,14 @@ namespace Assets.Scripts.Game
             var objectSize = PositionHelper.GetObjectDimensions(playerDominoes[0]);
             var positions = PositionHelper.GetLayoutAcrossScreen(objectSize, MainCamera, playerDominoes.Count, BottomSideMargin);
 
+            playerYPosition = positions[0].y;
+
             for (int i = 0; i < playerDominoes.Count; i++)
             {
                 var domino = playerDominoes[i];
                 var mover = domino.GetComponent<Mover>();
 
-                //mover.DealDomino(positions[i], LayoutManager.MainCamera, LayoutManager.BottomSideMargin);
-                //mover.DealDomino(positions[i]);
-                var staggerDelay = 0.02f * i;
+                var staggerDelay = FlyInStaggerDelay * i;
 
                 StartCoroutine(mover.MoveOverSeconds(positions[i], 0.5f, staggerDelay));
             }
@@ -69,13 +68,21 @@ namespace Assets.Scripts.Game
             return PositionHelper.GetScreenLeftCenterPositionForObject(objectSize, MainCamera, 0);
         }
 
+        public void SelectDomino(GameObject domino)
+        {
+            var destination = new Vector3(domino.transform.position.x, playerYPosition + SelectionRaiseAmount, domino.transform.position.z);
+
+            var mover = domino.GetComponent<Mover>();
+            StartCoroutine(mover.MoveOverSeconds(destination, SelectionDuration, 0));
+        }
+
         /// <summary>
         /// Resets the test scene. Destroys then recreates all of the objects.
         /// </summary>
         /// <param name="original">Object to be duplicated</param>
         /// <param name="count">Number of duplicates to create</param>
         /// <param name="sideMargin">Distance from edge of screen</param>
-        public void Reset(List<GameObject> playerDominoes, float sideMargin = 0f)
+        public void Reset(List<GameObject> playerDominoes, float sideMargin = 0f) // TODO: Replace Reset()
         {
             bool bottomGroupExisted = bottomGroup.PlayerObjects.Objects.Count > 0;
 

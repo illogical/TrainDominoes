@@ -2,6 +2,7 @@ using Assets.Scripts.Game;
 using Assets.Scripts.Helpers;
 using Assets.Scripts.Models;
 using Mirror;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -11,12 +12,11 @@ public class GameSession : NetworkBehaviour
 {
     [SerializeField] private GameObject playerDominoPrefab = null;
     [SerializeField] private GameObject tableDominoPrefab = null;
-    [SerializeField] private GameObject playerPositionEmpty = null;
 
-    private int dominoCount = 12;
+    //private int dominoCount = 12;
     private Dictionary<int, DominoInfo> dominoData = new Dictionary<int, DominoInfo>();
     private List<int> availableDominoes = new List<int>();  // TODO: ensure the clients don't have this list
-    private List<GameObject> playerDominoes = new List<GameObject>();
+    private Dictionary<int, GameObject> dominoObjects = new Dictionary<int, GameObject>();   // TODO: now both clients know about each other's dominoes. Feels unsure.
 
     private Quaternion dominoRotation = Quaternion.Euler(new Vector3(-90, 0, 180));
 
@@ -41,7 +41,7 @@ public class GameSession : NetworkBehaviour
         //dominoPlayer = identity.GetComponent<DominoPlayer>();
         //dominoPlayer.CmdDealDomino();
 
-        PlayerDominoSelected?.OnEventRaised.AddListener(HandlePlayerDominoClicked);
+        //PlayerDominoSelected?.OnEventRaised.AddListener(HandlePlayerDominoClicked);
 
         StartGame();
     }
@@ -61,12 +61,12 @@ public class GameSession : NetworkBehaviour
 
     private void OnDestroy()
     {
-        PlayerDominoSelected?.OnEventRaised.RemoveListener(HandlePlayerDominoClicked);
+        //PlayerDominoSelected?.OnEventRaised.RemoveListener(HandlePlayerDominoClicked);
     }
 
     public void StartGame()
     {
-        NetworkDebugger.OutputAuthority(this, nameof(StartGame), true);
+        NetworkDebugger.OutputAuthority(this, $"GameSession.{nameof(StartGame)}", true);
 
         if (isServer)
         {
@@ -81,6 +81,18 @@ public class GameSession : NetworkBehaviour
     {
         // TODO: notice that this never has authority on client or server. Wtf?
         NetworkDebugger.OutputAuthority(this, $"GameSession.{nameof(HandlePlayerDominoClicked)}", true);
+
+        //var dominoObject = dominoObjects[id];
+        //RpcMoveSelectedDomino(dominoObject);    // TODO: why is connectionToClient always null here? (running on server only but how to allow clients to call this? BAH it should be a command but can an even call a command? It was a Server function prior)
+        NetworkIdentity identity = NetworkClient.connection.identity;
+        var dominoPlayer = identity.GetComponent<DominoPlayer>();
+        dominoPlayer.CmdSelectDomino(id, NetworkClient.connection.identity.netId);
+
+    }
+
+    public GameObject GetDominoById(int id)
+    {
+        return dominoObjects[id];
     }
 
     #region Server
@@ -103,7 +115,7 @@ public class GameSession : NetworkBehaviour
         //int nextIndex = currentDominoIndex;
         //currentDominoIndex = Mathf.Clamp(currentDominoIndex + 1, 0, dominoData.Count - 1);
 
-        var nextDominoEntity = dominoData[availableDominoes[0]];       
+        var nextDominoEntity = dominoData[availableDominoes[0]];
 
         availableDominoes.RemoveAt(0);
 
@@ -154,6 +166,8 @@ public class GameSession : NetworkBehaviour
         dom.BottomScore = info.BottomScore;
         dom.Purpose = purpose;
 
+        dominoObjects.Add(info.ID, newDomino);
+
         return newDomino;
     }
 
@@ -181,13 +195,13 @@ public class GameSession : NetworkBehaviour
 
         var newDomino = GetNewPlayerDomino();
         var dom = tableDomino.GetComponent<DominoEntity>();
-        // TODO: move this to when the server creates the instance
+
         dom.ID = dominoInfo.ID;
         dom.TopScore = dominoInfo.TopScore;
         dom.BottomScore = dominoInfo.BottomScore;
 
+        dominoObjects.Add(dominoInfo.ID, newDomino);
         NetworkServer.Spawn(newDomino, connectionToClient);
-        //AddPlayerDomino(newDomino);
 
         RpcShowDominoes(newDomino);
     }
@@ -232,7 +246,7 @@ public class GameSession : NetworkBehaviour
     {
         NetworkDebugger.OutputAuthority(this, nameof(RpcShowDominoes));
 
-        LayoutManager.PlacePlayerDominoes(dominoes);
+        //LayoutManager.PlacePlayerDominoes(dominoes);      // TODO: fix this before using GameSession.RpcShowDominoes()
 
         for (int i = 0; i < dominoes.Count; i++)
         {
@@ -279,9 +293,7 @@ public class GameSession : NetworkBehaviour
         LayoutManager.PlaceEngine(domino);
     }
 
-    #endregion Client
-
-
+    [Client]
     public void MovePlayerDomino(GameObject domino, int index, bool hasAuthority)
     {
         if (hasAuthority)
@@ -299,9 +311,10 @@ public class GameSession : NetworkBehaviour
         }
     }
 
+    [Client]
     public void MovePlayerDominoes(List<GameObject> dominoes, bool hasAuthority)
     {
-        if(hasAuthority)
+        if (hasAuthority)
         {
             LayoutManager.PlacePlayerDominoes(dominoes);
         }
@@ -309,10 +322,23 @@ public class GameSession : NetworkBehaviour
         {
             // TODO: remove this. Currently displays other player's dominoes for debugging purposes only
 
-            foreach(var domino in dominoes)
+            foreach (var domino in dominoes)
             {
                 domino.transform.position = playerTopCenter;
             }
         }
     }
+
+    [TargetRpc]
+    public void RpcMoveSelectedDomino(NetworkConnection conn, GameObject domino)
+    {
+        NetworkDebugger.OutputAuthority(this, nameof(RpcMoveSelectedDomino), true);
+
+        LayoutManager.SelectDomino(domino);
+    }
+
+    #endregion Client
+
+
+
 }

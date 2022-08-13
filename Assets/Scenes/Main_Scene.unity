@@ -1156,16 +1156,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   BottomYOffset: 0
   BottomSideMargin: 0.01
+  SelectionRaiseAmount: 0.02
   SelectionEase:
     serializedVersion: 2
     m_Curve: []
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  SelectionDuration: 0.3
+  SelectionDuration: 0.15
+  FlyInStaggerDelay: 0.02
   MainCamera: {fileID: 1890532539}
   DominoPrefab: {fileID: 3325560248140386328, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
-  PlayerDominoSelectedEvent: {fileID: 11400000, guid: eb6e070dec80a7e4c9b6bb90aebc81ea, type: 2}
 --- !u!114 &1442959921
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1178,6 +1179,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2184f713ea086b04ba32c01434daeb67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   MainCamera: {fileID: 1890532539}
   BottomObjectClicked: {fileID: 11400000, guid: eb6e070dec80a7e4c9b6bb90aebc81ea, type: 2}
 --- !u!1 &1691172395

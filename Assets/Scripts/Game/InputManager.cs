@@ -1,8 +1,9 @@
 using Assets.Scripts.Models;
+using Mirror;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class InputManager : MonoBehaviour
+public class InputManager : NetworkBehaviour
 {
     public Camera MainCamera;
     public SelectionEvent BottomObjectClicked;
@@ -12,6 +13,7 @@ public class InputManager : MonoBehaviour
     // TODO: how to prevent clicks while other things are happening? Wait for an event to fire that allows selections to continue?
 
     // Update is called once per frame
+    [ClientCallback]
     void Update()
     {
         GetMouseClick();
@@ -34,15 +36,28 @@ public class InputManager : MonoBehaviour
                 return;
             }
 
-            MouseClickedObject(dominoEntity.ID, dominoEntity.Purpose);
+            if(isClient)
+            {
+                MouseClickedObject(dominoEntity.ID, dominoEntity.Purpose);
+            }
         }
         
     }
 
     void MouseClickedObject(int id, PurposeType purpose)
     {
+        // TODO: how do we know which player clicked the mouse? This seems to only run on the local client
         // TODO: might need access to the parent object to know if this is a player or table domino
         Debug.Log($"Domino {id} ({purpose}) was clicked via InputManager");
-        BottomObjectClicked.RaiseEvent(id);
+
+        //BottomObjectClicked.RaiseEvent(id);
+        NetworkIdentity identity = NetworkClient.connection.identity;
+        var dominoPlayer = identity.GetComponent<DominoPlayer>();
+
+        dominoPlayer.CmdSelectDomino(id, NetworkClient.connection.identity.netId);
+
+
+        // TODO: figure out how events work
+
     }
 }

@@ -21,16 +21,6 @@ public class DominoPlayer : NetworkBehaviour
     public bool GetIsPartyOwner() => isPartyOwner;
     public string GetDisplayName() => displayName;
 
-    public void AddPlayerDomino(GameObject domino)
-    {
-        myDominoes.Add(domino);
-    }
-
-
-    public void Start()
-    {
-        NetworkDebugger.OutputAuthority(this, $"DominoPlayer.Start() ({displayName})", true);
-    }
 
     #region Server
 
@@ -58,22 +48,6 @@ public class DominoPlayer : NetworkBehaviour
     public void SetDisplayName(string name)
     {
         displayName = name;
-    }
-
-    [Server]
-    public void AddPlayerDominoes(List<GameObject> playerDominoes)
-    {
-        foreach (var domino in playerDominoes)
-        {
-            NetworkServer.Spawn(domino, connectionToClient);
-
-            if (isLocalPlayer)
-            {
-                AddPlayerDomino(domino);
-            }
-        }
-
-        RpcShowDominoes(playerDominoes);
     }
 
     #endregion
@@ -113,18 +87,15 @@ public class DominoPlayer : NetworkBehaviour
         ClientOnInfoUpdated?.Invoke();
     }
 
-    /// <summary>
-    /// Adds a single domino to a hand.
-    /// </summary>
     [Command]
-    public void CmdAddPlayerDomino()
+    public void CmdSelectDomino(int dominoId, uint netId)
     {
-        var gameSession = FindObjectOfType<GameSession>();
-        var freshDomino = gameSession.GetNewPlayerDomino();
+        NetworkDebugger.OutputAuthority(this, $"DominoPlayer.{nameof(CmdSelectDomino)}", true);
 
-        NetworkServer.Spawn(freshDomino, connectionToClient);    // TODO: will connectionToClient be null if this is sent from GameSession?
-        AddPlayerDomino(freshDomino);
-        RpcShowDominoes(new List<GameObject>() { freshDomino });
+        var gameSession = FindObjectOfType<GameSession>();
+        var dominoObject = gameSession.GetDominoById(dominoId);
+        gameSession.RpcMoveSelectedDomino(connectionToClient, dominoObject);
+
     }
 
     /// <summary>
@@ -136,34 +107,24 @@ public class DominoPlayer : NetworkBehaviour
     {
         var gameSession = FindObjectOfType<GameSession>();
         var newDominoes = gameSession.DealNewDominoes(dominoCount);
-        
+
         if (isLocalPlayer)
         {
             myDominoes.AddRange(newDominoes);
         }
 
         // TODO: can this only run on the the local player? isLocalPlayer causes client to not line up any dominoes for themselves
-        RpcShowDominoes(newDominoes);
+        RpcSetPlayerDominoPositions(newDominoes);
     }
 
     [ClientRpc]
-    public void RpcShowDominoes(List<GameObject> dominoes)
+    public void RpcSetPlayerDominoPositions(List<GameObject> dominoes)
     {
-        NetworkDebugger.OutputAuthority(this, nameof(RpcShowDominoes));
+        NetworkDebugger.OutputAuthority(this, nameof(RpcSetPlayerDominoPositions));
 
         var gameSession = FindObjectOfType<GameSession>();
         gameSession.MovePlayerDominoes(dominoes, hasAuthority);
     }
-
-    [TargetRpc]
-    public void RpcShowDominoes(NetworkConnection conn, List<GameObject> dominoes)
-    {
-        NetworkDebugger.OutputAuthority(this, nameof(RpcShowDominoes));
-
-        var gameSession = FindObjectOfType<GameSession>();
-        gameSession.MovePlayerDominoes(dominoes, hasAuthority);
-    }
-
 
     #endregion
 

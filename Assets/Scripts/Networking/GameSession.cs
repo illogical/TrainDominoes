@@ -241,7 +241,7 @@ public class GameSession : NetworkBehaviour
         }
     }
 
-    [ClientRpc]
+    [ClientRpc] // TODO: change to TargetRpc?
     public void RpcShowDominoes(List<GameObject> dominoes)
     {
         NetworkDebugger.OutputAuthority(this, nameof(RpcShowDominoes));

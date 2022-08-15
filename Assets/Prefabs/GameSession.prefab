@@ -12,6 +12,8 @@ GameObject:
   - component: {fileID: 1199748838697998529}
   - component: {fileID: 1199748838697998528}
   - component: {fileID: 1883398197}
+  - component: {fileID: 1442959920}
+  - component: {fileID: 1442959921}
   m_Layer: 0
   m_Name: GameSession
   m_TagString: Untagged
@@ -65,7 +67,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 1
   syncInterval: 0.1
-  dominoPrefab: {fileID: 3325560248140386328, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
+  playerDominoPrefab: {fileID: 3325560248140386328, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
+  tableDominoPrefab: {fileID: 3325560248140386328, guid: 61f798073cab57040b191233c2577a5d, type: 3}
+  LayoutManager: {fileID: 1442959920}
+  PlayerDominoSelected: {fileID: 11400000, guid: eb6e070dec80a7e4c9b6bb90aebc81ea, type: 2}
 --- !u!114 &1883398197
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -79,6 +84,46 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Domino: {fileID: -3747012877631595465, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
-  Player: {fileID: 315547288289211558, guid: 551f2c637c21cd244b49b2ce77ab0d61, type: 3}
   DistanceFromCamera: 0.13
   DistanceFromCenter: 0.07
+--- !u!114 &1442959920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1199748838697998531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6084fecf577987040b550e9cd5b48b05, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BottomYOffset: 0
+  BottomSideMargin: 0.01
+  SelectionRaiseAmount: 0.02
+  SelectionEase:
+    serializedVersion: 2
+    m_Curve: []
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  SelectionDuration: 0.15
+  FlyInStaggerDelay: 0.02
+  MainCamera: {fileID: 0}
+  DominoPrefab: {fileID: 3325560248140386328, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
+--- !u!114 &1442959921
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1199748838697998531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2184f713ea086b04ba32c01434daeb67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  MainCamera: {fileID: 0}
+  BottomObjectClicked: {fileID: 11400000, guid: eb6e070dec80a7e4c9b6bb90aebc81ea, type: 2}

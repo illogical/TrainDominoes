@@ -114,6 +114,7 @@ public class DominoPlayer : NetworkBehaviour
         }
 
         // TODO: can this only run on the the local player? isLocalPlayer causes client to not line up any dominoes for themselves
+        //RpcSetPlayerDominoPositions(connectionToClient, newDominoes);
         RpcSetPlayerDominoPositions(newDominoes);
     }
 

@@ -24,8 +24,6 @@ namespace Assets.Scripts.Game
 
         private float playerYPosition = 0;
 
-        private BottomGroup bottomGroup;    // TODO: kill this
-
         public void PlacePlayerDominoes(List<GameObject> playerDominoes)
         {
             PositionHelper.LayoutAcrossAndUnderScreen(playerDominoes, MainCamera, BottomSideMargin);  //place them outside of the camera's view to allow them to slide in
@@ -74,47 +72,6 @@ namespace Assets.Scripts.Game
 
             var mover = domino.GetComponent<Mover>();
             StartCoroutine(mover.MoveOverSeconds(destination, SelectionDuration, 0));
-        }
-
-        /// <summary>
-        /// Resets the test scene. Destroys then recreates all of the objects.
-        /// </summary>
-        /// <param name="original">Object to be duplicated</param>
-        /// <param name="count">Number of duplicates to create</param>
-        /// <param name="sideMargin">Distance from edge of screen</param>
-        public void Reset(List<GameObject> playerDominoes, float sideMargin = 0f) // TODO: Replace Reset()
-        {
-            bool bottomGroupExisted = bottomGroup.PlayerObjects.Objects.Count > 0;
-
-            if (bottomGroupExisted)
-            {
-                DestroyGroup(bottomGroup.PlayerObjects);
-            }
-
-            CreateBottomGroup(playerDominoes);
-
-            if (!bottomGroupExisted)
-            {
-                PositionHelper.LayoutAcrossAndUnderScreen(bottomGroup.PlayerObjects.Objects, MainCamera, sideMargin);
-                StartCoroutine(SlideStaggeredToYPosition(bottomGroup.PlayerObjects.Objects, bottomGroup.Empty.transform.position.y, () => bottomGroup.ParentGroupToEmpty()));
-            }
-            else
-            {
-                // TODO: make these slide to new positions and ParentGroupToEmpty when complete. Currently a bug [when moving in real-time in the AnimationEasing project]. 
-                PositionHelper.LayoutAcrossScreen(bottomGroup.PlayerObjects.Objects, MainCamera, bottomGroup.Empty.transform.position.y, sideMargin);
-            }
-        }
-
-        ObjectGroup<GameObject> CreateBottomGroup(List<GameObject> playerDominoes)
-        {
-            var newGroup = new ObjectGroup<GameObject>();
-
-            foreach (var domino in playerDominoes)
-            {
-                newGroup.Add(domino.name, domino);
-            }
-
-            return newGroup;
         }
 
         /// <summary>

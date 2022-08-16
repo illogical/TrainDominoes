@@ -17,6 +17,8 @@ namespace Assets.Scripts.Game
         [Space]
         public AnimationCurve SelectionEase;
         public float SelectionDuration = 0.03f;
+        public float DeselectionDuration = 0.02f;
+        public float DeselectionDelay = 0.01f;
         public float FlyInStaggerDelay = 0.02f;
         [Space]
         public Camera MainCamera;
@@ -72,6 +74,14 @@ namespace Assets.Scripts.Game
 
             var mover = domino.GetComponent<Mover>();
             StartCoroutine(mover.MoveOverSeconds(destination, SelectionDuration, 0));
+        }
+
+        public void DeselectDomino(GameObject domino)
+        {
+            var destination = new Vector3(domino.transform.position.x, playerYPosition, domino.transform.position.z);
+
+            var mover = domino.GetComponent<Mover>();
+            StartCoroutine(mover.MoveOverSeconds(destination, DeselectionDuration, DeselectionDelay));
         }
 
         /// <summary>

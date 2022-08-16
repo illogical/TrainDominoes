@@ -11,7 +11,10 @@ public class DominoPlayer : NetworkBehaviour
     private bool isPartyOwner = false;
     [SyncVar(hook = nameof(ClientHandleDisplayNameUpdated))]
     private string displayName;
-    [SerializeField] private List<GameObject> myDominoes = new List<GameObject>(); 
+    [SerializeField] private Dictionary<int, GameObject> myDominoes = new Dictionary<int, GameObject>();
+
+    private PlayerDominoes playerDominoes = new PlayerDominoes();
+    private GameObject selectedDomino = null;
 
     public static event Action ClientOnInfoUpdated;
     public static event Action<bool> AuthorityOnPartyOwnerStateUpdated;
@@ -88,14 +91,15 @@ public class DominoPlayer : NetworkBehaviour
     }
 
     [Command]
-    public void CmdSelectDomino(int dominoId, uint netId)
+    public void CmdSelectDomino(int dominoId, int netId)
     {
         NetworkDebugger.OutputAuthority(this, $"DominoPlayer.{nameof(CmdSelectDomino)}", true);
 
         var gameSession = FindObjectOfType<GameSession>();
         var dominoObject = gameSession.GetDominoById(dominoId);
-        gameSession.RpcMoveSelectedDomino(connectionToClient, dominoObject);
 
+        gameSession.RpcMoveSelectedDomino(connectionToClient, dominoObject, selectedDomino);
+        selectedDomino = dominoObject;
     }
 
     /// <summary>
@@ -110,7 +114,21 @@ public class DominoPlayer : NetworkBehaviour
 
         if (isLocalPlayer)
         {
-            myDominoes.AddRange(newDominoes);
+            foreach(var domino in newDominoes)
+            {
+                myDominoes.Add(domino.GetComponent<DominoEntity>().ID, domino);
+            }
+        }
+
+        if(connectionToClient != null)
+        {
+            var dominoIds = new List<int>();
+            foreach(var dom in newDominoes)
+            {
+                dominoIds.Add(dom.GetComponent<DominoEntity>().ID);
+            }
+
+            playerDominoes.AddDominoes((int)connectionToClient.identity.netId, dominoIds);
         }
 
         // TODO: can this only run on the the local player? isLocalPlayer causes client to not line up any dominoes for themselves
@@ -125,6 +143,7 @@ public class DominoPlayer : NetworkBehaviour
 
         var gameSession = FindObjectOfType<GameSession>();
         gameSession.MovePlayerDominoes(dominoes, hasAuthority);
+
     }
 
     #endregion

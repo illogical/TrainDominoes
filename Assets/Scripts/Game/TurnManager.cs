@@ -11,7 +11,7 @@ public class TurnManager : MonoBehaviour    // TODO: TurnManager is only a MonoB
         
     }
 
-    public void NextTurn() => turnIndex = Mathf.Clamp(turnIndex++, 0, playerIds.Count);
+    public void NextTurn() => turnIndex = turnIndex++ % playerIds.Count;
 
     public uint GetCurrentPlayerId() => playerIds[turnIndex];
 

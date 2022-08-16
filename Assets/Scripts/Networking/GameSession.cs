@@ -17,6 +17,7 @@ public class GameSession : NetworkBehaviour
     private Dictionary<int, DominoInfo> dominoData = new Dictionary<int, DominoInfo>();
     private List<int> availableDominoes = new List<int>();  // TODO: ensure the clients don't have this list
     private Dictionary<int, GameObject> dominoObjects = new Dictionary<int, GameObject>();   // TODO: now both clients know about each other's dominoes. Feels unsure.
+    //private PlayerDominoes playerDominoes = new PlayerDominoes();
 
     private Quaternion dominoRotation = Quaternion.Euler(new Vector3(-90, 0, 180));
 
@@ -86,7 +87,7 @@ public class GameSession : NetworkBehaviour
         //RpcMoveSelectedDomino(dominoObject);    // TODO: why is connectionToClient always null here? (running on server only but how to allow clients to call this? BAH it should be a command but can an even call a command? It was a Server function prior)
         NetworkIdentity identity = NetworkClient.connection.identity;
         var dominoPlayer = identity.GetComponent<DominoPlayer>();
-        dominoPlayer.CmdSelectDomino(id, NetworkClient.connection.identity.netId);
+        dominoPlayer.CmdSelectDomino(id, (int)NetworkClient.connection.identity.netId);
 
     }
 
@@ -130,6 +131,7 @@ public class GameSession : NetworkBehaviour
         for (int i = 0; i < dominoCount; i++)
         {
             var freshDomino = GetNewPlayerDomino();
+            var dominoInfo = freshDomino.GetComponent<DominoEntity>();
 
             // TODO: only do this if isLocalPlayer otherwise would spawn in all players' games??
             NetworkServer.Spawn(freshDomino, connectionToClient);
@@ -330,11 +332,16 @@ public class GameSession : NetworkBehaviour
     }
 
     [TargetRpc]
-    public void RpcMoveSelectedDomino(NetworkConnection conn, GameObject domino)
+    public void RpcMoveSelectedDomino(NetworkConnection conn, GameObject selectedDomino, GameObject previouslySelectedDomino)
     {
         NetworkDebugger.OutputAuthority(this, nameof(RpcMoveSelectedDomino), true);
 
-        LayoutManager.SelectDomino(domino);
+        LayoutManager.SelectDomino(selectedDomino);
+
+        if (previouslySelectedDomino != null)
+        {
+            LayoutManager.DeselectDomino(previouslySelectedDomino);
+        }
     }
 
     #endregion Client

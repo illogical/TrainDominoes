@@ -54,7 +54,9 @@ public class InputManager : NetworkBehaviour
         NetworkIdentity identity = NetworkClient.connection.identity;
         var dominoPlayer = identity.GetComponent<DominoPlayer>();
 
-        dominoPlayer.CmdSelectDomino(id, NetworkClient.connection.identity.netId);
+        int netId = (int)NetworkClient.connection.identity.netId;
+
+        dominoPlayer.CmdSelectDomino(id, netId);
 
 
         // TODO: figure out how events work

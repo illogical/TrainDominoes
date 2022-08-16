@@ -46,7 +46,10 @@ public class Mover : MonoBehaviour
 
     public IEnumerator MoveOverSeconds(Vector3 endPos, float seconds, float delay, Action afterComplete = null)
     {
-        yield return new WaitForSeconds(delay); // TODO: store in dictionary for performance's sake
+        if (delay > 0)
+        {
+            yield return new WaitForSeconds(delay); // TODO: store in dictionary for performance's sake
+        }
 
         float elapsedTime = 0;
         var startPos = transform.position;

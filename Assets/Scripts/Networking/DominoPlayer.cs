@@ -11,7 +11,6 @@ public class DominoPlayer : NetworkBehaviour
     private bool isPartyOwner = false;
     [SyncVar(hook = nameof(ClientHandleDisplayNameUpdated))]
     private string displayName;
-    [SerializeField] private Dictionary<int, GameObject> myDominoes = new Dictionary<int, GameObject>();
 
     private PlayerDominoes playerDominoes = new PlayerDominoes();
     private GameObject selectedDomino = null;
@@ -112,14 +111,6 @@ public class DominoPlayer : NetworkBehaviour
         var gameSession = FindObjectOfType<GameSession>();
         var newDominoes = gameSession.DealNewDominoes(dominoCount);
 
-        if (isLocalPlayer)
-        {
-            foreach(var domino in newDominoes)
-            {
-                myDominoes.Add(domino.GetComponent<DominoEntity>().ID, domino);
-            }
-        }
-
         if(connectionToClient != null)
         {
             var dominoIds = new List<int>();
@@ -128,6 +119,7 @@ public class DominoPlayer : NetworkBehaviour
                 dominoIds.Add(dom.GetComponent<DominoEntity>().ID);
             }
 
+            // store IDs of the dominoes that this player has in their hand
             playerDominoes.AddDominoes((int)connectionToClient.identity.netId, dominoIds);
         }
 

@@ -16,10 +16,10 @@ namespace Assets.Scripts.Game
         public float SelectionRaiseAmount = 0.02f;
         [Space]
         public AnimationCurve SelectionEase;
-        public float SelectionDuration = 0.03f;
-        public float DeselectionDuration = 0.02f;
-        public float DeselectionDelay = 0.01f;
-        public float FlyInStaggerDelay = 0.02f;
+        public float SelectionDuration = 0.3f;
+        public float DeselectionDuration = 0.2f;
+        public float DeselectionDelay = 0.2f;
+        public float FlyInStaggerDelay = 0.025f;
         [Space]
         public Camera MainCamera;
         public GameObject DominoPrefab;

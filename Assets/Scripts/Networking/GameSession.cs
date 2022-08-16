@@ -1,10 +1,8 @@
 using Assets.Scripts.Game;
-using Assets.Scripts.Helpers;
 using Assets.Scripts.Models;
 using Mirror;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 
 // TODO: make this a singleton for convenience?
@@ -15,9 +13,8 @@ public class GameSession : NetworkBehaviour
 
     //private int dominoCount = 12;
     private Dictionary<int, DominoInfo> dominoData = new Dictionary<int, DominoInfo>();
-    private List<int> availableDominoes = new List<int>();  // TODO: ensure the clients don't have this list
+    private List<int> availableDominoes = new List<int>();
     private Dictionary<int, GameObject> dominoObjects = new Dictionary<int, GameObject>();   // TODO: now both clients know about each other's dominoes. Feels unsure.
-    //private PlayerDominoes playerDominoes = new PlayerDominoes();
 
     private Quaternion dominoRotation = Quaternion.Euler(new Vector3(-90, 0, 180));
 
@@ -179,14 +176,9 @@ public class GameSession : NetworkBehaviour
         tableDomino = GetNewEngineDomino();
         NetworkServer.Spawn(tableDomino);
 
-        // only happens on the server
-        //tableDomino.transform.position = tablePosition;
-        //LayoutManager.PlaceEngine(tableDomino);
 
         tableDomino.transform.position = Vector3.zero;
         LayoutManager.PlaceEngine(tableDomino);
-
-        //RpcShowTableDominoes(tableDomino);
     }
 
     //[Command(requiresAuthority = false)]
@@ -256,35 +248,7 @@ public class GameSession : NetworkBehaviour
         }
     }
 
-    /// <summary>
-    /// Adds multiple dominoes to a hand for starting the game.
-    /// </summary>
-    /// <param name="dominoCount"></param>
-    [Server]
-    public void AddPlayerDominoes(int dominoCount)
-    {
-        var newDominoes = new List<GameObject>();
 
-        for (int i = 0; i < dominoCount; i++)
-        {
-            var freshDomino = GetNewPlayerDomino();
-            NetworkServer.Spawn(freshDomino, connectionToClient);    // TODO: will connectionToClient be null if this is sent from GameSession?
-            
-            // TODO: need to add domino to DominoPlayer for localPlayer
-            if(isLocalPlayer)
-            {
-                //AddPlayerDomino(freshDomino);
-            }
-
-            newDominoes.Add(freshDomino);
-        }
-
-        // TODO: get current player and add dominoes
-        //DominoPlayer player = connectionToClient.identity.GetComponent<DominoPlayer>(); // TODO: will connectionToClient be null if this is sent from GameSession?
-        //player.AddPlayerDominoes(newDominoes);
-
-        //RpcShowDominoes(newDominoes);
-    }
 
     [ClientRpc]
     public void RpcShowTableDominoes(GameObject domino) // TODO: kill this now that this is rightfully done on the server

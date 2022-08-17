@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 1883398197}
   - component: {fileID: 1442959920}
   - component: {fileID: 1442959921}
+  - component: {fileID: 679130552504588390}
   m_Layer: 0
   m_Name: GameSession
   m_TagString: Untagged
@@ -69,7 +70,8 @@ MonoBehaviour:
   syncInterval: 0.1
   playerDominoPrefab: {fileID: 3325560248140386328, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
   tableDominoPrefab: {fileID: 3325560248140386328, guid: 61f798073cab57040b191233c2577a5d, type: 3}
-  LayoutManager: {fileID: 1442959920}
+  Layout: {fileID: 1442959920}
+  TurnManager: {fileID: 679130552504588390}
   PlayerDominoSelected: {fileID: 11400000, guid: eb6e070dec80a7e4c9b6bb90aebc81ea, type: 2}
 --- !u!114 &1883398197
 MonoBehaviour:
@@ -113,6 +115,7 @@ MonoBehaviour:
   FlyInStaggerDelay: 0.025
   MainCamera: {fileID: 0}
   DominoPrefab: {fileID: 3325560248140386328, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
+  TopPanel: {fileID: 0}
 --- !u!114 &1442959921
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -129,3 +132,19 @@ MonoBehaviour:
   syncInterval: 0.1
   MainCamera: {fileID: 0}
   BottomObjectClicked: {fileID: 11400000, guid: eb6e070dec80a7e4c9b6bb90aebc81ea, type: 2}
+--- !u!114 &679130552504588390
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1199748838697998531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6abd4d3a2b9539e4092aa121484a2088, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  turnIndex: 0
+  playerIds: 

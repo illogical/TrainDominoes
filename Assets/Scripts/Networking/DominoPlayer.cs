@@ -15,6 +15,10 @@ public class DominoPlayer : NetworkBehaviour
     private PlayerDominoes playerDominoes = new PlayerDominoes();
     private GameObject selectedDomino = null;
 
+    [SyncVar]
+    [HideInInspector] 
+    public int ID;
+
     public static event Action ClientOnInfoUpdated;
     public static event Action<bool> AuthorityOnPartyOwnerStateUpdated;
 
@@ -52,7 +56,7 @@ public class DominoPlayer : NetworkBehaviour
         displayName = name;
     }
 
-    #endregion
+    #endregion Server
 
 
     #region Client
@@ -128,6 +132,13 @@ public class DominoPlayer : NetworkBehaviour
         RpcSetPlayerDominoPositions(newDominoes);
     }
 
+    [Command]
+    public void CmdEndTurn(int netId)
+    {
+        var gameSession = FindObjectOfType<GameSession>();
+        gameSession.EndTurn(netId);
+    }
+
     [ClientRpc]
     public void RpcSetPlayerDominoPositions(List<GameObject> dominoes)
     {
@@ -136,8 +147,12 @@ public class DominoPlayer : NetworkBehaviour
         var gameSession = FindObjectOfType<GameSession>();
         gameSession.MovePlayerDominoes(dominoes, hasAuthority);
 
+        if(hasAuthority)
+        {
+            gameSession.Layout.SetHeaderText($"Hi, {ID} ({displayName})");
+        }
     }
 
-    #endregion
+    #endregion Client
 
 }

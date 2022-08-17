@@ -25,6 +25,7 @@ public class MyNetworkManager : NetworkManager
         base.OnServerAddPlayer(conn);
 
         DominoPlayer player = conn.identity.GetComponent<DominoPlayer>();
+        player.ID = (int)conn.identity.netId;
         Players.Add(player);
 
         player.SetDisplayName($"Player {Players.Count}");

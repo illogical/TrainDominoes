@@ -23,6 +23,7 @@ namespace Assets.Scripts.Game
         [Space]
         public Camera MainCamera;
         public GameObject DominoPrefab;
+        public GameObject TopPanel;
 
         private float playerYPosition = 0;
 
@@ -82,6 +83,12 @@ namespace Assets.Scripts.Game
 
             var mover = domino.GetComponent<Mover>();
             StartCoroutine(mover.MoveOverSeconds(destination, DeselectionDuration, DeselectionDelay));
+        }
+
+        public void SetHeaderText(string message)
+        {
+            TopPanel.SetActive(true);
+            TopPanel.GetComponent<TopText>().SetHeaderText(message);
         }
 
         /// <summary>

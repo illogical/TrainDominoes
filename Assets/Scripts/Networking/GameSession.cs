@@ -26,11 +26,13 @@ public class GameSession : NetworkBehaviour
 
     private bool gameStarted = false;
 
-    public LayoutManager LayoutManager = null;
-    [HideInInspector]
-    public DominoTracker DominoTracker = new DominoTracker();
+    public LayoutManager Layout = null;
+    public TurnManager TurnManager = null;
 
     public SelectionEvent PlayerDominoSelected;
+
+    [HideInInspector]
+    public DominoTracker DominoTracker = new DominoTracker();
 
 
     private void Start()
@@ -178,7 +180,17 @@ public class GameSession : NetworkBehaviour
 
 
         tableDomino.transform.position = Vector3.zero;
-        LayoutManager.PlaceEngine(tableDomino);
+        Layout.PlaceEngine(tableDomino);
+    }
+
+    [Server]
+    public void EndTurn(int callerNetId)
+    {
+        if (!TurnManager.IsPlayerTurn(callerNetId)) { return; }
+
+        TurnManager.NextTurn();
+
+        Debug.Log($"It is Player {TurnManager.GetCurrentPlayerId()}'s turn. It was {callerNetId}'s turn.");
     }
 
     //[Command(requiresAuthority = false)]
@@ -256,7 +268,7 @@ public class GameSession : NetworkBehaviour
         NetworkDebugger.OutputAuthority(this, nameof(RpcShowTableDominoes), true);
 
         domino.transform.position = Vector3.zero;
-        LayoutManager.PlaceEngine(domino);
+        Layout.PlaceEngine(domino);
     }
 
     [Client]
@@ -282,7 +294,7 @@ public class GameSession : NetworkBehaviour
     {
         if (hasAuthority)
         {
-            LayoutManager.PlacePlayerDominoes(dominoes);
+            Layout.PlacePlayerDominoes(dominoes);
         }
         else
         {
@@ -300,11 +312,11 @@ public class GameSession : NetworkBehaviour
     {
         NetworkDebugger.OutputAuthority(this, nameof(RpcMoveSelectedDomino), true);
 
-        LayoutManager.SelectDomino(selectedDomino);
+        Layout.SelectDomino(selectedDomino);
 
         if (previouslySelectedDomino != null)
         {
-            LayoutManager.DeselectDomino(previouslySelectedDomino);
+            Layout.DeselectDomino(previouslySelectedDomino);
         }
     }
 

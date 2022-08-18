@@ -35,15 +35,6 @@ public class DominoPlayer : NetworkBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    [Command]
-    public void CmdStartGame()
-    {
-        if (!isPartyOwner) { return; }
-
-        ((MyNetworkManager)NetworkManager.singleton).StartGame();
-    }
-
-
     [Server]
     public void SetPartyOwner(bool state)
     {
@@ -94,6 +85,14 @@ public class DominoPlayer : NetworkBehaviour
     }
 
     [Command]
+    public void CmdStartGame()
+    {
+        if (!isPartyOwner) { return; }
+
+    ((MyNetworkManager)NetworkManager.singleton).StartGame();
+    }
+
+    [Command]
     public void CmdSelectDomino(int dominoId, int netId)
     {
         NetworkDebugger.OutputAuthority(this, $"DominoPlayer.{nameof(CmdSelectDomino)}", true);
@@ -124,12 +123,13 @@ public class DominoPlayer : NetworkBehaviour
             }
 
             // store IDs of the dominoes that this player has in their hand
-            playerDominoes.AddDominoes((int)connectionToClient.identity.netId, dominoIds);
+            int netId = (int)connectionToClient.identity.netId;
+            playerDominoes.AddDominoes(netId, dominoIds);
+            RpcSetPlayerTurnText(netId, false);
         }
 
         // TODO: can this only run on the the local player? isLocalPlayer causes client to not line up any dominoes for themselves
-        //RpcSetPlayerDominoPositions(connectionToClient, newDominoes);
-        RpcSetPlayerDominoPositions(newDominoes);
+        RpcSetPlayerDominoPositions(newDominoes);   
     }
 
     [Command]
@@ -137,20 +137,21 @@ public class DominoPlayer : NetworkBehaviour
     {
         var gameSession = FindObjectOfType<GameSession>();
         gameSession.EndTurn(netId);
+        RpcSetPlayerTurnText((int)connectionToClient.identity.netId, true);
     }
 
     [ClientRpc]
     public void RpcSetPlayerDominoPositions(List<GameObject> dominoes)
     {
-        NetworkDebugger.OutputAuthority(this, nameof(RpcSetPlayerDominoPositions));
-
         var gameSession = FindObjectOfType<GameSession>();
         gameSession.MovePlayerDominoes(dominoes, hasAuthority);
+    }
 
-        if(hasAuthority)
-        {
-            gameSession.Layout.SetHeaderText($"Hi, {ID} ({displayName})");
-        }
+    [ClientRpc]
+    public void RpcSetPlayerTurnText(int netId, bool updateAll)
+    {
+        var gameSession = FindObjectOfType<GameSession>();
+        gameSession.DisplayPlayersTurn(netId, isLocalPlayer, updateAll);
     }
 
     #endregion Client

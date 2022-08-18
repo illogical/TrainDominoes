@@ -48,13 +48,14 @@ public class GameSession : NetworkBehaviour
 
     private void Update()
     {
+        // TODO: this is all sloppy. CreateTableDomino
         if(!gameStarted)
         {
             gameStarted = true;
             
             if(isServer)
             {
-                CreateTableDomino();
+                CreateAndPlaceNextEngine();
             }
         }
     }
@@ -71,18 +72,15 @@ public class GameSession : NetworkBehaviour
         if (isServer)
         {
             DominoTracker.CreateDominoSet();
-
-            //AddPlayerDominoes(dominoCount);
         }
     }
 
     // TODO: introduce state machine soon because different states will subscribe to relevant events
     public void HandlePlayerDominoClicked(int id)
     {
-        // TODO: notice that this never has authority on client or server. Wtf?
+        // TODO: notice that this never has authority on client or server
         NetworkDebugger.OutputAuthority(this, $"GameSession.{nameof(HandlePlayerDominoClicked)}", true);
 
-        //var dominoObject = dominoObjects[id];
         //RpcMoveSelectedDomino(dominoObject);    // TODO: why is connectionToClient always null here? (running on server only but how to allow clients to call this? BAH it should be a command but can an even call a command? It was a Server function prior)
         NetworkIdentity identity = NetworkClient.connection.identity;
         var dominoPlayer = identity.GetComponent<DominoPlayer>();
@@ -109,11 +107,8 @@ public class GameSession : NetworkBehaviour
     {
         if(availableDominoes.Count == 0)
         {
-            Debug.LogError("Server is out of dominoes");
+            Debug.LogError("Server is out of dominoes. Game over?");
         }
-
-        //int nextIndex = currentDominoIndex;
-        //currentDominoIndex = Mathf.Clamp(currentDominoIndex + 1, 0, dominoData.Count - 1);
 
         var nextDominoEntity = dominoData[availableDominoes[0]];
 
@@ -173,11 +168,10 @@ public class GameSession : NetworkBehaviour
     }
 
     [Server]
-    public void CreateTableDomino()
+    public void CreateAndPlaceNextEngine()
     {
         tableDomino = GetNewEngineDomino();
         NetworkServer.Spawn(tableDomino);
-
 
         tableDomino.transform.position = Vector3.zero;
         Layout.PlaceEngine(tableDomino);
@@ -191,25 +185,6 @@ public class GameSession : NetworkBehaviour
         TurnManager.NextTurn();
 
         Debug.Log($"It is Player {TurnManager.GetCurrentPlayerId()}'s turn. It was {callerNetId}'s turn.");
-    }
-
-    //[Command(requiresAuthority = false)]
-    [Command] // reminder: runs on server but is called by client
-    public void CmdDealDominoes()
-    {
-        var dominoInfo = GetNextDomino();
-
-        var newDomino = GetNewPlayerDomino();
-        var dom = tableDomino.GetComponent<DominoEntity>();
-
-        dom.ID = dominoInfo.ID;
-        dom.TopScore = dominoInfo.TopScore;
-        dom.BottomScore = dominoInfo.BottomScore;
-
-        dominoObjects.Add(dominoInfo.ID, newDomino);
-        NetworkServer.Spawn(newDomino, connectionToClient);
-
-        RpcShowDominoes(newDomino);
     }
 
     #endregion Server
@@ -228,67 +203,6 @@ public class GameSession : NetworkBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-
-    [ClientRpc]
-    public void RpcShowDominoes(GameObject domino)
-    {
-        if (hasAuthority)
-        {
-            var mover = domino.GetComponent<Mover>();
-            domino.transform.position = new Vector3(0, 0, 0);
-
-            // animate the movement for the current player
-            StartCoroutine(mover.MoveOverSeconds(playerBottomCenter, 0.5f, 0));
-        }
-        else
-        {
-            // TODO: no longer render the other player's dominoes. May want to use TargetRpc instead and check for isLocalPlayer before executing it and passing connectionToClient to it.
-            domino.transform.position = playerTopCenter;
-        }
-    }
-
-    [ClientRpc] // TODO: change to TargetRpc?
-    public void RpcShowDominoes(List<GameObject> dominoes)
-    {
-        NetworkDebugger.OutputAuthority(this, nameof(RpcShowDominoes));
-
-        //LayoutManager.PlacePlayerDominoes(dominoes);      // TODO: fix this before using GameSession.RpcShowDominoes()
-
-        for (int i = 0; i < dominoes.Count; i++)
-        {
-            MovePlayerDomino(dominoes[i], i, hasAuthority);
-        }
-    }
-
-
-
-    [ClientRpc]
-    public void RpcShowTableDominoes(GameObject domino) // TODO: kill this now that this is rightfully done on the server
-    {
-        NetworkDebugger.OutputAuthority(this, nameof(RpcShowTableDominoes), true);
-
-        domino.transform.position = Vector3.zero;
-        Layout.PlaceEngine(domino);
-    }
-
-    [Client]
-    public void MovePlayerDomino(GameObject domino, int index, bool hasAuthority)
-    {
-        if (hasAuthority)
-        {
-            var mover = domino.GetComponent<Mover>();
-            domino.transform.position = new Vector3(0, 0, 0);   // TODO: get next position based upon index in ObjectGroup
-
-            // animate the movement for the current player
-            StartCoroutine(mover.MoveOverSeconds(playerBottomCenter, 0.5f, 0));
-        }
-        else
-        {
-            // TODO: no longer render the other player's dominoes
-            domino.transform.position = playerTopCenter;
-        }
-    }
-
     [Client]
     public void MovePlayerDominoes(List<GameObject> dominoes, bool hasAuthority)
     {
@@ -303,6 +217,37 @@ public class GameSession : NetworkBehaviour
             foreach (var domino in dominoes)
             {
                 domino.transform.position = playerTopCenter;
+            }
+        }
+    }
+
+    [Client]
+    public void DisplayPlayersTurn(int callerNetId, bool isLocal, bool updateAll)
+    {
+        var isLocalTurn = false;
+
+        if (isLocal)
+        {
+            isLocalTurn = true;
+            if (TurnManager.IsPlayerTurn(callerNetId))
+            {
+                Layout.SetHeaderText($"It is your turn");
+            }
+            else
+            {
+                Layout.SetHeaderText($"It is NOT your turn");
+            }
+        } 
+        
+        if (updateAll)
+        {
+            if (!isLocalTurn)        // TODO: this works for 2 player but would not for more. How do we know who this client is? Instead maybe subscribe to an event in DominoPlayer so this runs for each player?
+            {
+                Layout.SetHeaderText($"It is your turn");
+            }
+            else
+            {
+                Layout.SetHeaderText($"It is NOT your turn");
             }
         }
     }

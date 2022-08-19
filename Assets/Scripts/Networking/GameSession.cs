@@ -1,4 +1,5 @@
 using Assets.Scripts.Game;
+using Assets.Scripts.Game.States;
 using Assets.Scripts.Models;
 using Mirror;
 using System;
@@ -8,31 +9,24 @@ using UnityEngine;
 // TODO: make this a singleton for convenience?
 public class GameSession : NetworkBehaviour
 {
-    [SerializeField] private GameObject playerDominoPrefab = null;
-    [SerializeField] private GameObject tableDominoPrefab = null;
-
     private int dominoCount = 12;
-    private Dictionary<int, DominoInfo> dominoData = new Dictionary<int, DominoInfo>();
-    private List<int> availableDominoes = new List<int>();
-    private Dictionary<int, GameObject> dominoObjects = new Dictionary<int, GameObject>();   // TODO: now both clients know about each other's dominoes. Feels unsure.
-
-    private Quaternion dominoRotation = Quaternion.Euler(new Vector3(-90, 0, 180));
-
-    private Vector3 playerTopCenter = new Vector3(0, 0.08f, 0);
-    private Vector3 playerBottomCenter = new Vector3(0, -0.08f, 0);
-    private Vector3 tablePosition = new Vector3(0, 0, 0);
-
-    private GameObject tableDomino;
-
     private bool gameStarted = false;
 
     public LayoutManager Layout = null;
     public TurnManager TurnManager = null;
+    public MeshManager MeshManager = null;
 
+    [Space]
     public SelectionEvent PlayerDominoSelected;
 
-    [HideInInspector]
-    public DominoTracker DominoTracker = new DominoTracker();
+    private DominoTracker DominoTracker = new DominoTracker();
+
+    private Dictionary<int, DominoInfo> dominoData = new Dictionary<int, DominoInfo>();
+    private List<int> availableDominoes = new List<int>();
+
+    private GameStateContext gameState = new GameStateContext();
+
+
 
     private void Start()
     {
@@ -50,8 +44,10 @@ public class GameSession : NetworkBehaviour
         if(!gameStarted)
         {
             gameStarted = true;            
-            DealPlayerDominoes();
+            DealPlayerDominoes(); // TODO: move this to GameStartedState
         }
+
+        gameState.Update();
     }
 
     private void OnDestroy()
@@ -68,7 +64,7 @@ public class GameSession : NetworkBehaviour
 
     public GameObject GetDominoById(int id)
     {
-        return dominoObjects[id];
+        return MeshManager.GetDominoMeshById(id);
     }
 
     #region Server
@@ -84,21 +80,6 @@ public class GameSession : NetworkBehaviour
     private void StartGame()
     {
         DominoTracker.CreateDominoSet();
-    }
-
-    [Server]
-    public DominoInfo GetNextDomino()
-    {
-        if(availableDominoes.Count == 0)
-        {
-            Debug.LogError("Server is out of dominoes. Game over?");
-        }
-
-        var nextDominoEntity = dominoData[availableDominoes[0]];
-
-        availableDominoes.RemoveAt(0);
-
-        return nextDominoEntity;
     }
 
     [Server]
@@ -123,41 +104,25 @@ public class GameSession : NetworkBehaviour
     public GameObject GetNewPlayerDomino()
     {
         var dominoInfo = DominoTracker.GetDominoFromBonePile();
-        return CreateDominoFromInfo(playerDominoPrefab, dominoInfo, playerBottomCenter, PurposeType.Player);
+        return MeshManager.GetPlayerDomino(MeshManager.PlayerDominoPrefab, dominoInfo, Layout.PlayerBottomCenter);
     }
 
     [Server]
     public GameObject GetNewEngineDomino()
     {
         var dominoInfo = DominoTracker.GetNextEngine();
-        return CreateDominoFromInfo(tableDominoPrefab, dominoInfo, Vector3.zero, PurposeType.Engine);
-    }
 
-    [Server]
-    public GameObject CreateDominoFromInfo(GameObject prefab, DominoInfo info, Vector3 position, PurposeType purpose)         // TODO: move to MeshManager
-    {
-        var newDomino = Instantiate(prefab, position, dominoRotation);
-        newDomino.name = info.ID.ToString();    // TODO: this only sets the name on the server
-
-        var dom = newDomino.GetComponent<DominoEntity>();
-        dom.ID = info.ID;
-        dom.TopScore = info.TopScore;
-        dom.BottomScore = info.BottomScore;
-        dom.Purpose = purpose;
-
-        dominoObjects.Add(info.ID, newDomino);
-
-        return newDomino;
+        return MeshManager.GetEngineDomino(MeshManager.TableDominoPrefab, dominoInfo, Vector3.zero);
     }
 
     [Server]
     public void CreateAndPlaceNextEngine()
     {
-        tableDomino = GetNewEngineDomino();
-        NetworkServer.Spawn(tableDomino);
+        var engineMesh = GetNewEngineDomino();
+        NetworkServer.Spawn(engineMesh);
 
-        tableDomino.transform.position = Vector3.zero;
-        Layout.PlaceEngine(tableDomino);
+        engineMesh.transform.position = Vector3.zero;
+        Layout.PlaceEngine(engineMesh);
     }
 
     [Server]
@@ -196,10 +161,9 @@ public class GameSession : NetworkBehaviour
         else
         {
             // TODO: remove this. Currently displays other player's dominoes for debugging purposes only
-
             foreach (var domino in dominoes)
             {
-                domino.transform.position = playerTopCenter;
+                domino.transform.position = Layout.PlayerTopCenter + new Vector3(0, 10, 0); // TODO: out of sight out of mind [is dangerous]. I think clients should be creating their own, non-networked, dominoes
             }
         }
     }

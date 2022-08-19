@@ -10,20 +10,24 @@ namespace Assets.Scripts.Game
 {    
     public class LayoutManager : MonoBehaviour
     {
-        [Range(0, 2)]
-        public float BottomYOffset = 0.01f;
-        public float BottomSideMargin = 0.01f;
-        public float SelectionRaiseAmount = 0.02f;
-        [Space]
-        public AnimationCurve SelectionEase;
-        public float SelectionDuration = 0.3f;
-        public float DeselectionDuration = 0.2f;
-        public float DeselectionDelay = 0.2f;
-        public float FlyInStaggerDelay = 0.025f;
         [Space]
         public Camera MainCamera;
         public GameObject DominoPrefab;
         public GameObject TopPanel;
+        [Header("Animations")]
+        public AnimationDefinition PlayerDominoSlideIn;
+        public AnimationDefinition EngineSlideIn;
+        public AnimationDefinition DominoSelection;
+        public AnimationDefinition DominoDeselection;
+        public AnimationCurve test;
+        [Space]
+        public Vector3 PlayerTopCenter = new Vector3(0, 0.08f, 0);
+        public Vector3 PlayerBottomCenter = new Vector3(0, -0.08f, 0);
+        public Vector3 TablePosition = new Vector3(0, 0, 0);
+        [Range(0, 2)]
+        public float BottomYOffset = 0.01f;
+        public float BottomSideMargin = 0.01f;
+        public float SelectionRaiseAmount = 0.02f;
 
         private float playerYPosition = 0;
 
@@ -41,9 +45,9 @@ namespace Assets.Scripts.Game
                 var domino = playerDominoes[i];
                 var mover = domino.GetComponent<Mover>();
 
-                var staggerDelay = FlyInStaggerDelay * i;
+                var staggerDelay = PlayerDominoSlideIn.Delay * i;
 
-                StartCoroutine(mover.MoveOverSeconds(positions[i], 0.5f, staggerDelay));
+                StartCoroutine(mover.MoveOverSeconds(positions[i], PlayerDominoSlideIn.Duration, staggerDelay, PlayerDominoSlideIn.Curve));
             }
         }
 
@@ -60,7 +64,7 @@ namespace Assets.Scripts.Game
             var destination = GetEnginePosition(engine);
 
             var mover = engine.GetComponent<Mover>();
-            StartCoroutine(mover.MoveOverSeconds(destination, 0.5f, 0, afterComplete));
+            StartCoroutine(mover.MoveOverSeconds(destination, EngineSlideIn, afterComplete));
         }
 
         public Vector3 GetEnginePosition(GameObject engine)
@@ -74,7 +78,7 @@ namespace Assets.Scripts.Game
             var destination = new Vector3(domino.transform.position.x, playerYPosition + SelectionRaiseAmount, domino.transform.position.z);
 
             var mover = domino.GetComponent<Mover>();
-            StartCoroutine(mover.MoveOverSeconds(destination, SelectionDuration, 0));
+            StartCoroutine(mover.MoveOverSeconds(destination, DominoSelection));
         }
 
         public void DeselectDomino(GameObject domino)
@@ -82,7 +86,7 @@ namespace Assets.Scripts.Game
             var destination = new Vector3(domino.transform.position.x, playerYPosition, domino.transform.position.z);
 
             var mover = domino.GetComponent<Mover>();
-            StartCoroutine(mover.MoveOverSeconds(destination, DeselectionDuration, DeselectionDelay));
+            StartCoroutine(mover.MoveOverSeconds(destination, DominoDeselection));
         }
 
         public void SetHeaderText(string message)
@@ -105,26 +109,26 @@ namespace Assets.Scripts.Game
             }
         }
 
-        IEnumerator SlideStaggeredToYPosition(List<GameObject> gameObjects, float destinationYPosition, Action afterComplete = null)
-        {
-            float animationDuration = 0.8f;
-            float delayBeforeAnimation = 0.5f;
-            float delayStagger = 0.04f;
-            float totalAnimationTime = gameObjects.Count * delayStagger + delayBeforeAnimation + animationDuration;
+        //IEnumerator SlideStaggeredToYPosition(List<GameObject> gameObjects, float destinationYPosition, Action afterComplete = null)
+        //{
+        //    float animationDuration = 0.8f;
+        //    float delayBeforeAnimation = 0.5f;
+        //    float delayStagger = 0.04f;
+        //    float totalAnimationTime = gameObjects.Count * delayStagger + delayBeforeAnimation + animationDuration;
 
-            for (int i = 0; i < gameObjects.Count; i++)
-            {
-                var currentObj = gameObjects[i];
-                Vector3 pos = new Vector3(currentObj.transform.position.x, destinationYPosition, 0);
-                StartCoroutine(AnimationHelper.MoveOverSeconds(currentObj.transform, pos, animationDuration, i * delayStagger + delayBeforeAnimation, SelectionEase));
-            }
+        //    for (int i = 0; i < gameObjects.Count; i++)
+        //    {
+        //        var currentObj = gameObjects[i];
+        //        Vector3 pos = new Vector3(currentObj.transform.position.x, destinationYPosition, 0);
+        //        StartCoroutine(AnimationHelper.MoveOverSeconds(currentObj.transform, pos, animationDuration, i * delayStagger + delayBeforeAnimation, SelectionEase));
+        //    }
 
-            yield return new WaitForSeconds(totalAnimationTime);
+        //    yield return new WaitForSeconds(totalAnimationTime);
 
-            if (afterComplete != null)
-            {
-                afterComplete();
-            }
-        }
+        //    if (afterComplete != null)
+        //    {
+        //        afterComplete();
+        //    }
+        //}
     }
 }

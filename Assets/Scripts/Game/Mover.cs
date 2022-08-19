@@ -6,9 +6,30 @@ using UnityEngine;
 
 public class Mover : MonoBehaviour
 {
-    [SerializeField] private AnimationCurve animationCurve;
+    public IEnumerator MoveOverSeconds(Vector3 endPos, AnimationDefinition animationDefinition, Action afterComplete = null)
+    {
+        if (animationDefinition.Delay > 0)
+        {
+            yield return new WaitForSeconds(animationDefinition.Delay); // TODO: store in dictionary for performance's sake
+        }
 
-    public IEnumerator MoveOverSeconds(Vector3 endPos, float seconds, float delay, Action afterComplete = null)
+        float elapsedTime = 0;
+        var startPos = transform.position;
+        while (elapsedTime < animationDefinition.Duration)
+        {
+            transform.position = Vector3.Lerp(startPos, endPos, animationDefinition.Curve.Evaluate(elapsedTime / animationDefinition.Duration));
+            elapsedTime += Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
+        transform.position = endPos;
+
+        if (afterComplete != null)
+        {
+            afterComplete();
+        }
+    }
+
+    public IEnumerator MoveOverSeconds(Vector3 endPos, float seconds, float delay, AnimationCurve animationCurve, Action afterComplete = null)
     {
         if (delay > 0)
         {
@@ -31,7 +52,7 @@ public class Mover : MonoBehaviour
         }
     }
 
-    public IEnumerator RotateOverSeconds(Quaternion rotationAmount, float seconds, float delay)
+    public IEnumerator RotateOverSeconds(Quaternion rotationAmount, float seconds, AnimationCurve animationCurve, float delay)
     {
         yield return new WaitForSeconds(delay);
 

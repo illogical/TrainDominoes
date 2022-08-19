@@ -11,10 +11,11 @@ GameObject:
   - component: {fileID: 1199748838697998534}
   - component: {fileID: 1199748838697998529}
   - component: {fileID: 1199748838697998528}
-  - component: {fileID: 1883398197}
   - component: {fileID: 1442959920}
+  - component: {fileID: 4160694712847016934}
   - component: {fileID: 1442959921}
   - component: {fileID: 679130552504588390}
+  - component: {fileID: 1883398197}
   m_Layer: 0
   m_Name: GameSession
   m_TagString: Untagged
@@ -68,26 +69,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 1
   syncInterval: 0.1
-  playerDominoPrefab: {fileID: 3325560248140386328, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
-  tableDominoPrefab: {fileID: 3325560248140386328, guid: 61f798073cab57040b191233c2577a5d, type: 3}
   Layout: {fileID: 1442959920}
   TurnManager: {fileID: 679130552504588390}
+  MeshManager: {fileID: 4160694712847016934}
   PlayerDominoSelected: {fileID: 11400000, guid: eb6e070dec80a7e4c9b6bb90aebc81ea, type: 2}
---- !u!114 &1883398197
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1199748838697998531}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19c9ed53f9f3cb141896c9f81dc6f14e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Domino: {fileID: -3747012877631595465, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
-  DistanceFromCamera: 0.13
-  DistanceFromCenter: 0.07
 --- !u!114 &1442959920
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -100,22 +85,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6084fecf577987040b550e9cd5b48b05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BottomYOffset: 0
-  BottomSideMargin: 0.01
-  SelectionRaiseAmount: 0.02
-  SelectionEase:
+  MainCamera: {fileID: 0}
+  DominoPrefab: {fileID: 3325560248140386328, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
+  TopPanel: {fileID: 0}
+  PlayerDominoSlideIn: {fileID: 11400000, guid: 55787c68ea1cfdc4eafd106061ec7cf5, type: 2}
+  EngineSlideIn: {fileID: 11400000, guid: 026a97c894704b64d8a932d1ed418e2e, type: 2}
+  DominoSelection: {fileID: 11400000, guid: fb803e31b9b94c0478a20b8c74b121fc, type: 2}
+  DominoDeselection: {fileID: 11400000, guid: 9713d809b46f21d458d3aa2ec11af66b, type: 2}
+  test:
     serializedVersion: 2
     m_Curve: []
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  SelectionDuration: 0.3
-  DeselectionDuration: 0.2
-  DeselectionDelay: 0.2
-  FlyInStaggerDelay: 0.025
-  MainCamera: {fileID: 0}
-  DominoPrefab: {fileID: 3325560248140386328, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
-  TopPanel: {fileID: 0}
+  PlayerTopCenter: {x: 0, y: 0.08, z: 0}
+  PlayerBottomCenter: {x: 0, y: -0.08, z: 0}
+  TablePosition: {x: 0, y: 0, z: 0}
+  BottomYOffset: 0
+  BottomSideMargin: 0.01
+  SelectionRaiseAmount: 0.02
+--- !u!114 &4160694712847016934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1199748838697998531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 88186684c80a15344be83763fc2e9eb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  PlayerDominoPrefab: {fileID: 3325560248140386328, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
+  TableDominoPrefab: {fileID: 3325560248140386328, guid: 61f798073cab57040b191233c2577a5d, type: 3}
 --- !u!114 &1442959921
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -148,3 +150,18 @@ MonoBehaviour:
   syncInterval: 0.1
   turnIndex: 0
   playerIds: 
+--- !u!114 &1883398197
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1199748838697998531}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 19c9ed53f9f3cb141896c9f81dc6f14e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Domino: {fileID: -3747012877631595465, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
+  DistanceFromCamera: 0.13
+  DistanceFromCenter: 0.07

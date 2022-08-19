@@ -1056,6 +1056,18 @@ PrefabInstance:
       propertyPath: MainCamera
       value: 
       objectReference: {fileID: 1890532539}
+    - target: {fileID: 1442959920, guid: 8015a3d21ddef2345a7d0eccfa47b4f0, type: 3}
+      propertyPath: test.m_Curve.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1442959920, guid: 8015a3d21ddef2345a7d0eccfa47b4f0, type: 3}
+      propertyPath: test.m_Curve.Array.data[1].time
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1442959920, guid: 8015a3d21ddef2345a7d0eccfa47b4f0, type: 3}
+      propertyPath: test.m_Curve.Array.data[1].value
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1442959921, guid: 8015a3d21ddef2345a7d0eccfa47b4f0, type: 3}
       propertyPath: MainCamera
       value: 
@@ -1295,8 +1307,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d65e631c081a7ed43a925b4105ca1b0c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
 --- !u!114 &1691172398
 MonoBehaviour:
   m_ObjectHideFlags: 0

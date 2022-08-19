@@ -14,7 +14,6 @@ namespace Assets.Scripts.Game
         public Transform Player;
         public SelectionEvent DominoSelected;
         public SelectionEvent TrackSelected;
-        // works well for camera at 75 degree FOV
         [Space]
         public Vector3 PlayerDistanceFromCamera = new Vector3(0, -0.105f, 0.08f);
         public float StationDistanceFromCamera = 0.05f;
@@ -33,16 +32,10 @@ namespace Assets.Scripts.Game
         
         // TODO: might want a state machine for when the Domino is selected then the next state would be a TableDomino if one side or the other matches
 
-        void Start()
-        {
-
-        }
-
         void Update()
         {
             HandleDominoSelection();
         }
-
 
         private void HandleDominoSelection()
         {
@@ -112,44 +105,6 @@ namespace Assets.Scripts.Game
             domino.transform.position = down;
         }
 
-        //private Vector3Tween ShowSelectedDomino(GameObject domino)
-        //{
-        //    var currentX = domino.transform.position.x;
-        //    var up = PlayerDistanceFromCamera + new Vector3(currentX, DistanceWhenSelected, 0);
-
-        //    System.Action<ITween<Vector3>> updateDominoPos = (t) => domino.gameObject.transform.position = t.CurrentValue;
-
-        //    System.Action<ITween<Vector3>> circleMoveCompleted = (t) =>
-        //    {
-        //        selectedPlayerDomino = domino;
-        //        allowClick = true;
-        //    };
-
-        //    return domino.transform.gameObject.Tween("SelectMoveUp", domino.transform.position, up, SelectSpeed, TweenScaleFunctions.CubicEaseOut, updateDominoPos, circleMoveCompleted);
-        //}
-
-        //private Vector3Tween ShowDeselectedDomino(GameObject domino)
-        //{
-        //    var currentX = domino.transform.position.x;
-        //    var down = PlayerDistanceFromCamera + new Vector3(currentX, 0, 0);
-        //    System.Action<ITween<Vector3>> updateDominoPos = (t) => domino.transform.position = t.CurrentValue;
-
-
-        //    return domino.Tween("DeselectMoveDown", domino.transform.position, down, SelectSpeed, TweenScaleFunctions.CubicEaseIn, updateDominoPos);
-        //}
-
-        //private Vector3Tween MovePlayerDominoToTrack(GameObject domino, Vector3 destinationPosition)
-        //{           
-        //    System.Action<ITween<Vector3>> updateDominoPos = (t) => domino.gameObject.transform.position = t.CurrentValue;
-
-        //    return domino.Tween("MovePlayerDominoToTrack", domino.transform.position, destinationPosition, MoveToTrackSpeed, TweenScaleFunctions.CubicEaseInOut, updateDominoPos);
-        //}
-
-        //private void RotateDominoAddedToTrack(Transform dominoTransform, Vector3 destinationRotation)
-        //{
-        //    Tween.Rotation(dominoTransform, destinationRotation, 0.3f, 0.05f, Tween.EaseInOutStrong);
-        //}
-
         public void CreateMesh(DominoEntity domino)
         {
             var newMesh = Instantiate(DominoMesh, DominoMesh.transform.position, DominoMesh.transform.rotation, Player);
@@ -165,15 +120,6 @@ namespace Assets.Scripts.Game
                 CreateMesh(domino);
             }
         }        
-
-
-        // TODO: no need to delete any meshes. Will store meshes in an array. May need to manage the Active flags on all of them
-        //private void removeMesh(DominoEntity domino)
-        //{
-        //    Destroy(domino.Mesh);
-        //    domino.Mesh = null;
-        //}
-        
 
         public void AlignPlayerDominoes(List<DominoEntity> dominoes)
         {
@@ -221,28 +167,9 @@ namespace Assets.Scripts.Game
             //MovePlayerDominoToTrack(domino.Mesh, GetTrackPostion(dominoCount, trackIndex, renderer.bounds.size));
         }
 
-        // TODO: Fix AlignEngine() (need to manage a single list of all the domino meshes)
-        /*
-        public void AlignEngine(DominoEntity domino) // TODO: pass in track as Dictionary<int, DominoEntity> when ready to add more tracks
-        {            
-            var renderer = domino.Mesh.GetComponent<Renderer>();
-            float width = renderer.bounds.size.y; // will flip horizontally so use y            
-            float xOffset = width / 2;
-
-            var leftSide = GetScreenCenterLeft();
-
-            // get position of empty to provide y & z
-            Vector3 linePos = new Vector3(leftSide.x, leftSide.y, StationDistanceFromCamera);
-
-            domino.Mesh.transform.Rotate(new Vector3(0, -90, 0));
-            domino.Mesh.transform.position = new Vector3(xOffset, 0, 0) + linePos;
-        }
-        */
-
         public void AddDominoToTrack(DominoEntity domino)
         {
-            // TODO: need a new list of dominoes on the track to know which one was last
-            // TODO: need a way to flip a domino (could just swap Top/Bottom numbers for now but would be cooler with an animation)
+            
         }
 
         private void AlignTrackEmpty(Vector3 trackPosition)
@@ -270,15 +197,5 @@ namespace Assets.Scripts.Game
             return Camera.ViewportToWorldPoint(new Vector3(-1, 0.5f, StationDistanceFromCamera));
         }
 
-        //public Vector3 GetScreenPosition(Transform transform, Canvas canvas, Camera cam)
-        //{
-        //    Vector3 pos;
-        //    float width = canvas.GetComponent<RectTransform>().sizeDelta.x;
-        //    float height = canvas.GetComponent<RectTransform>().sizeDelta.y;
-        //    float x = Camera.main.WorldToScreenPoint(transform.position).x / Screen.width;
-        //    float y = Camera.main.WorldToScreenPoint(transform.position).y / Screen.height;
-        //    pos = new Vector3(width * x - width / 2, y * height - height / 2);
-        //    return pos;
-        //}
     }
 }

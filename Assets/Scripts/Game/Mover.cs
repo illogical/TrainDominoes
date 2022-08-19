@@ -8,42 +8,6 @@ public class Mover : MonoBehaviour
 {
     [SerializeField] private AnimationCurve animationCurve;
 
-    public IEnumerator DealDomino(Vector3 destination)
-    {
-        yield return StartCoroutine(MoveOverSeconds(destination, 0.5f, 0));
-
-        //var objectSize = PositionHelper.GetObjectDimensions(this.gameObject);
-        //var positions = PositionHelper.GetLayoutAcrossScreen(objectSize, camera, totalDominoesInRow, sideMargin);
-
-        //PositionHelper.LayoutAcrossAndUnderScreen(gameObjects, mainCamera, sideMargin);
-
-        //GetCenterPositionByIndex(index, distanceFromEachOther, centerOffSet);
-
-        //StartCoroutine(SlideStaggeredToYPosition(bottomGroup.PlayerObjects.Objects, bottomGroup.Empty.transform.position.y, () => bottomGroup.ParentGroupToEmpty()));
-    }
-
-    public IEnumerator SlideStaggeredToYPosition(List<GameObject> gameObjects, float destinationYPosition, AnimationCurve curve, Action afterComplete = null)
-    {
-        float animationDuration = 0.8f;
-        float delayBeforeAnimation = 0.5f;
-        float delayStagger = 0.04f;
-        float totalAnimationTime = gameObjects.Count * delayStagger + delayBeforeAnimation + animationDuration;
-
-        for (int i = 0; i < gameObjects.Count; i++)
-        {
-            var currentObj = gameObjects[i];
-            Vector3 pos = new Vector3(currentObj.transform.position.x, destinationYPosition, 0);
-            StartCoroutine(AnimationHelper.MoveOverSeconds(currentObj.transform, pos, animationDuration, i * delayStagger + delayBeforeAnimation, curve));
-        }
-
-        yield return new WaitForSeconds(totalAnimationTime);
-
-        if (afterComplete != null)
-        {
-            afterComplete();
-        }
-    }
-
     public IEnumerator MoveOverSeconds(Vector3 endPos, float seconds, float delay, Action afterComplete = null)
     {
         if (delay > 0)
@@ -91,5 +55,10 @@ public class Mover : MonoBehaviour
         }
 
         yield return StartCoroutine(AnimationHelper.MoveOverSeconds(objectTransform, endPos, duration, delay, curve));
+    }
+
+    public IEnumerator SlideToPositionByIndex(int index, Vector3 destination, float animationDuration, float delayBeforeStart, float delayStagger, AnimationCurve curve)
+    {
+        yield return StartCoroutine(AnimationHelper.MoveOverSeconds(transform, destination, animationDuration, index * delayStagger + delayBeforeStart, curve));
     }
 }

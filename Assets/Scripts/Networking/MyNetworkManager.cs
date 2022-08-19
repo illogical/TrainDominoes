@@ -61,13 +61,8 @@ public class MyNetworkManager : NetworkManager
             GameOverHandler gameOverHandlerInstance = Instantiate(gameOverHandler);
             NetworkServer.Spawn(gameOverHandlerInstance.gameObject);
 
-            // TODO: STUCK HERE 7/22/22. How to make gameSession persisent across scenes? maybe just don't make it here?
-            // TODO: how will I access the server's gameSessionInstance vs the clients'?
             //gameSessionInstance = Instantiate(gameSessionPrefab);
 
-            // create a game session on the server
-            //NetworkServer.Spawn(gameSessionInstance.gameObject);  // TODO: not sure if this is needed but the client doesn't know how run the command on it
-            //gameSessionInstance.StartGame();
         }
     }
 

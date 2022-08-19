@@ -46,18 +46,13 @@ public class InputManager : NetworkBehaviour
 
     void MouseClickedObject(int id, PurposeType purpose)
     {
-        // TODO: how do we know which player clicked the mouse? This seems to only run on the local client
-        // TODO: might need access to the parent object to know if this is a player or table domino
         Debug.Log($"Domino {id} ({purpose}) was clicked via InputManager");
 
         //BottomObjectClicked.RaiseEvent(id);
         NetworkIdentity identity = NetworkClient.connection.identity;
         var dominoPlayer = identity.GetComponent<DominoPlayer>();
 
-        int netId = (int)NetworkClient.connection.identity.netId;
-
-        dominoPlayer.CmdSelectDomino(id, netId);
-
+        dominoPlayer.CmdSelectDomino(id);
 
         // TODO: figure out how events work
 

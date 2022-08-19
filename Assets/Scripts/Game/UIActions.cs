@@ -10,7 +10,7 @@ public class UIActions : MonoBehaviour
         var dominoPlayer = identity.GetComponent<DominoPlayer>();
 
         // can call this from a Monobehaviour!
-        dominoPlayer.CmdAddPlayerDominoes(12);
+        dominoPlayer.CmdDealDominoes(12);
 
     }
 

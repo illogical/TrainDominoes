@@ -11,7 +11,7 @@ public class GameSession : NetworkBehaviour
     [SerializeField] private GameObject playerDominoPrefab = null;
     [SerializeField] private GameObject tableDominoPrefab = null;
 
-    //private int dominoCount = 12;
+    private int dominoCount = 12;
     private Dictionary<int, DominoInfo> dominoData = new Dictionary<int, DominoInfo>();
     private List<int> availableDominoes = new List<int>();
     private Dictionary<int, GameObject> dominoObjects = new Dictionary<int, GameObject>();   // TODO: now both clients know about each other's dominoes. Feels unsure.
@@ -34,29 +34,23 @@ public class GameSession : NetworkBehaviour
     [HideInInspector]
     public DominoTracker DominoTracker = new DominoTracker();
 
-
     private void Start()
     {
-        //NetworkIdentity identity = NetworkClient.connection.identity;
-        //dominoPlayer = identity.GetComponent<DominoPlayer>();
-        //dominoPlayer.CmdDealDomino();
-
         //PlayerDominoSelected?.OnEventRaised.AddListener(HandlePlayerDominoClicked);
 
-        StartGame();
+        if (isServer)
+        {
+            StartGame();
+            CreateAndPlaceNextEngine();
+        }
     }
 
     private void Update()
     {
-        // TODO: this is all sloppy. CreateTableDomino
         if(!gameStarted)
         {
-            gameStarted = true;
-            
-            if(isServer)
-            {
-                CreateAndPlaceNextEngine();
-            }
+            gameStarted = true;            
+            DealPlayerDominoes();
         }
     }
 
@@ -65,27 +59,11 @@ public class GameSession : NetworkBehaviour
         //PlayerDominoSelected?.OnEventRaised.RemoveListener(HandlePlayerDominoClicked);
     }
 
-    public void StartGame()
+
+    private void DealPlayerDominoes()
     {
-        NetworkDebugger.OutputAuthority(this, $"GameSession.{nameof(StartGame)}", true);
-
-        if (isServer)
-        {
-            DominoTracker.CreateDominoSet();
-        }
-    }
-
-    // TODO: introduce state machine soon because different states will subscribe to relevant events
-    public void HandlePlayerDominoClicked(int id)
-    {
-        // TODO: notice that this never has authority on client or server
-        NetworkDebugger.OutputAuthority(this, $"GameSession.{nameof(HandlePlayerDominoClicked)}", true);
-
-        //RpcMoveSelectedDomino(dominoObject);    // TODO: why is connectionToClient always null here? (running on server only but how to allow clients to call this? BAH it should be a command but can an even call a command? It was a Server function prior)
-        NetworkIdentity identity = NetworkClient.connection.identity;
-        var dominoPlayer = identity.GetComponent<DominoPlayer>();
-        dominoPlayer.CmdSelectDomino(id, (int)NetworkClient.connection.identity.netId);
-
+        // runs per player
+        GetPlayer().CmdDealDominoes(dominoCount);   // TODO: dominoCount needs to be dynamic depending upon player count
     }
 
     public GameObject GetDominoById(int id)
@@ -100,6 +78,12 @@ public class GameSession : NetworkBehaviour
         base.OnStartServer();
 
         DontDestroyOnLoad(gameObject);
+    }
+
+    [Server]
+    private void StartGame()
+    {
+        DominoTracker.CreateDominoSet();
     }
 
     [Server]
@@ -125,7 +109,6 @@ public class GameSession : NetworkBehaviour
         for (int i = 0; i < dominoCount; i++)
         {
             var freshDomino = GetNewPlayerDomino();
-            var dominoInfo = freshDomino.GetComponent<DominoEntity>();
 
             // TODO: only do this if isLocalPlayer otherwise would spawn in all players' games??
             NetworkServer.Spawn(freshDomino, connectionToClient);
@@ -267,6 +250,10 @@ public class GameSession : NetworkBehaviour
 
     #endregion Client
 
-
+    private DominoPlayer GetPlayer()
+    {
+        NetworkIdentity identity = NetworkClient.connection.identity;
+        return identity.GetComponent<DominoPlayer>();
+    }
 
 }

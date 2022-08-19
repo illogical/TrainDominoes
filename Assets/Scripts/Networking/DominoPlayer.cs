@@ -89,15 +89,14 @@ public class DominoPlayer : NetworkBehaviour
     {
         if (!isPartyOwner) { return; }
 
-    ((MyNetworkManager)NetworkManager.singleton).StartGame();
+        ((MyNetworkManager)NetworkManager.singleton).StartGame();
     }
 
     [Command]
-    public void CmdSelectDomino(int dominoId, int netId)
+    public void CmdSelectDomino(int dominoId)
     {
-        NetworkDebugger.OutputAuthority(this, $"DominoPlayer.{nameof(CmdSelectDomino)}", true);
-
         var gameSession = FindObjectOfType<GameSession>();
+        // TODO: check if this is on the table and if so then ignore it. After the state machine is implemented then it would take different action if a domino is selected.
         var dominoObject = gameSession.GetDominoById(dominoId);
 
         gameSession.RpcMoveSelectedDomino(connectionToClient, dominoObject, selectedDomino);
@@ -109,8 +108,9 @@ public class DominoPlayer : NetworkBehaviour
     /// </summary>
     /// <param name="dominoCount"></param>
     [Command]
-    public void CmdAddPlayerDominoes(int dominoCount)
+    public void CmdDealDominoes(int dominoCount)
     {
+        // TODO: move this logic into MeshManager (except for the Rpc call)
         var gameSession = FindObjectOfType<GameSession>();
         var newDominoes = gameSession.DealNewDominoes(dominoCount);
 

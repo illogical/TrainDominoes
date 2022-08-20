@@ -12,9 +12,6 @@ public class DominoPlayer : NetworkBehaviour
     [SyncVar(hook = nameof(ClientHandleDisplayNameUpdated))]
     private string displayName;
 
-    private PlayerDominoes playerDominoes = new PlayerDominoes();
-    private GameObject selectedDomino = null;
-
     [SyncVar]
     [HideInInspector] 
     public int ID;
@@ -93,14 +90,14 @@ public class DominoPlayer : NetworkBehaviour
     }
 
     [Command]
-    public void CmdSelectDomino(int dominoId)
+    public void CmdSelectDomino(int dominoId, int? lastSelectedId)
     {
         var gameSession = FindObjectOfType<GameSession>();
         // TODO: check if this is on the table and if so then ignore it. After the state machine is implemented then it would take different action if a domino is selected.
-        var dominoObject = gameSession.GetDominoById(dominoId);
+        var dominoObject = gameSession.MeshManager.GetDominoMeshById(dominoId);
+        GameObject lastSelectedDomino = lastSelectedId.HasValue ? gameSession.MeshManager.GetDominoMeshById(lastSelectedId.Value) : null;
 
-        gameSession.RpcMoveSelectedDomino(connectionToClient, dominoObject, selectedDomino);
-        selectedDomino = dominoObject;
+        gameSession.RpcMoveSelectedDomino(connectionToClient, dominoObject, lastSelectedDomino);
     }
 
     /// <summary>
@@ -124,7 +121,7 @@ public class DominoPlayer : NetworkBehaviour
 
             // store IDs of the dominoes that this player has in their hand
             int netId = (int)connectionToClient.identity.netId;
-            playerDominoes.AddDominoes(netId, dominoIds);
+            gameSession.GameplayManager.DominoTracker.AddPlayerDominoes(netId, dominoIds);
             RpcSetPlayerTurnText(netId, false);
         }
 

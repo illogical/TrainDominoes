@@ -10,7 +10,9 @@ namespace Assets.Scripts.Game
     {
         public int? SelectedDomino { get; private set; }
         public Dictionary<int, DominoInfo> AllDominoes = new Dictionary<int, DominoInfo>();
+        // TODO: begin tracking tracks
 
+        private PlayerDominoes playerDominoes = new PlayerDominoes();
         private List<int> availableDominoes = new List<int>();
         private List<int> engineIndices = new List<int>();
         private int engineIndex = 0;
@@ -41,14 +43,24 @@ namespace Assets.Scripts.Game
             }
         }
 
-        public DominoInfo GetDominoByID(int id)
-        {
-            return AllDominoes[id];
-        }
+        public DominoInfo GetDominoByID(int dominoId) => AllDominoes[dominoId];
+        public bool IsPlayerDomino(int dominoId) => playerDominoes.Dominoes.ContainsKey(dominoId);
+        public bool IsEngine(int dominoId) => engineIndices[engineIndex] == dominoId;
+
 
         public void SetSelectedDomino(int dominoId)
         {
             SelectedDomino = dominoId;
+        }
+
+        public void AddPlayerDomino(int netId, int dominoId)
+        {
+            playerDominoes.AddDomino(netId, dominoId);
+        }
+
+        public void AddPlayerDominoes(int netId, List<int> dominoId)
+        {
+            playerDominoes.AddDominoes(netId, dominoId);
         }
 
         public DominoInfo GetDominoFromBonePile()

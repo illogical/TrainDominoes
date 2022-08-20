@@ -27,8 +27,10 @@ namespace Assets.Scripts.Game.States
                 return;
             }
 
+            gameStateContext.GameplayManager.DominoTracker.SetSelectedDomino(SelectedDominoId.Value);
+
             // TODO: ensure the clicked domino is the player's (rather than a table domino)
-            gameStateContext.Player.CmdSelectDomino(SelectedDominoId.Value);
+            gameStateContext.Player.CmdSelectDomino(SelectedDominoId.Value, null);
 
             gameStateContext.SwitchState(gameStateContext.PlayerSelectedPlayerDominoState);
 

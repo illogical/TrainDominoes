@@ -44,11 +44,6 @@ public class GameSession : NetworkBehaviour
         gameState.Update();
     }
 
-    public GameObject GetDominoById(int id)
-    {
-        return MeshManager.GetDominoMeshById(id);
-    }
-
     #region Server
 
     public override void OnStartServer()

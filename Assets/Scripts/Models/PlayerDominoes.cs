@@ -36,17 +36,5 @@ namespace Assets.Scripts.Models
             Dominoes[netId].AddRange(dominoIds);
         }
 
-        //public void AddDominoes(uint netId, List<GameObject> dominoes)
-        //{
-        //    if (!Dominoes.ContainsKey(netId))
-        //    {
-        //        Dominoes.Add(netId, new List<int>());
-        //    }
-
-        //    foreach(GameObject domino in dominoes)
-        //    {
-        //        Dominoes[netId].Add(domino.GetComponent<DominoEntity>().ID);
-        //    }
-        //}
     }
 }

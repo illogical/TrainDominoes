@@ -94,8 +94,10 @@ public class DominoPlayer : NetworkBehaviour
     {
         var gameSession = FindObjectOfType<GameSession>();
         // TODO: check if this is on the table and if so then ignore it. After the state machine is implemented then it would take different action if a domino is selected.
-        var dominoObject = gameSession.MeshManager.GetDominoMeshById(dominoId);
-        GameObject lastSelectedDomino = lastSelectedId.HasValue ? gameSession.MeshManager.GetDominoMeshById(lastSelectedId.Value) : null;
+        var dominoObject = gameSession.GameplayManager.MeshManager.GetDominoMeshById(dominoId);
+        GameObject lastSelectedDomino = lastSelectedId.HasValue 
+            ? gameSession.GameplayManager.MeshManager.GetDominoMeshById(lastSelectedId.Value) 
+            : null;
 
         gameSession.RpcMoveSelectedDomino(connectionToClient, dominoObject, lastSelectedDomino);
     }
@@ -133,7 +135,7 @@ public class DominoPlayer : NetworkBehaviour
     public void CmdEndTurn(int netId)
     {
         var gameSession = FindObjectOfType<GameSession>();
-        gameSession.EndTurn(netId);
+        gameSession.GameplayManager.EndTurn(netId);
         RpcSetPlayerTurnText((int)connectionToClient.identity.netId, true);
     }
 

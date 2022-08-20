@@ -11,6 +11,7 @@ namespace Assets.Scripts.Game
         public int? SelectedDomino { get; private set; }
         public Dictionary<int, DominoInfo> AllDominoes = new Dictionary<int, DominoInfo>();
         // TODO: begin tracking tracks
+        private Station station;
 
         private PlayerDominoes playerDominoes = new PlayerDominoes();
         private List<int> availableDominoes = new List<int>();
@@ -73,10 +74,12 @@ namespace Assets.Scripts.Game
             return domino;
         }
 
-        public DominoInfo GetNextEngine()
+        public DominoInfo GetNextEngineAndCreateStation()
         {
             var engine = AllDominoes[engineIndices[engineIndex++]];
             availableDominoes.Remove(engine.ID);    // no longer available to pick up
+
+            station = new Station(engine);
 
             return engine;
         }

@@ -69,10 +69,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 1
   syncInterval: 0.1
-  Layout: {fileID: 1442959920}
-  TurnManager: {fileID: 679130552504588390}
-  MeshManager: {fileID: 4160694712847016934}
-  PlayerDominoSelected: {fileID: 11400000, guid: eb6e070dec80a7e4c9b6bb90aebc81ea, type: 2}
+  GameplayManager: {fileID: 1883398197}
 --- !u!114 &1442959920
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -94,7 +91,25 @@ MonoBehaviour:
   DominoDeselection: {fileID: 11400000, guid: 9713d809b46f21d458d3aa2ec11af66b, type: 2}
   test:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
@@ -133,7 +148,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   MainCamera: {fileID: 0}
-  BottomObjectClicked: {fileID: 11400000, guid: eb6e070dec80a7e4c9b6bb90aebc81ea, type: 2}
+  DominoClicked: {fileID: 11400000, guid: eb6e070dec80a7e4c9b6bb90aebc81ea, type: 2}
 --- !u!114 &679130552504588390
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -162,6 +177,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19c9ed53f9f3cb141896c9f81dc6f14e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Domino: {fileID: -3747012877631595465, guid: 04a3b17bc1ca13144bb0acdfdfccebb9, type: 3}
-  DistanceFromCamera: 0.13
-  DistanceFromCenter: 0.07
+  MeshManager: {fileID: 4160694712847016934}
+  LayoutManager: {fileID: 1442959920}
+  TurnManager: {fileID: 679130552504588390}
+  DominoClicked: {fileID: 11400000, guid: eb6e070dec80a7e4c9b6bb90aebc81ea, type: 2}

@@ -8,6 +8,8 @@ public class GameplayManager : MonoBehaviour
 {
     public MeshManager MeshManager = null;
     public LayoutManager LayoutManager = null;
+    public TurnManager TurnManager = null;
+    [Header("Events")]
     public SelectionEvent DominoClicked;
 
     [HideInInspector]
@@ -29,7 +31,16 @@ public class GameplayManager : MonoBehaviour
 
     public GameObject GetNewEngineDomino()
     {
-        var dominoInfo = DominoTracker.GetNextEngine();
+        var dominoInfo = DominoTracker.GetNextEngineAndCreateStation();
         return MeshManager.GetEngineDomino(MeshManager.TableDominoPrefab, dominoInfo, Vector3.zero);
+    }
+
+    public void EndTurn(int callerNetId)
+    {
+        if (!TurnManager.IsPlayerTurn(callerNetId)) { return; }
+
+        TurnManager.NextTurn();
+
+        Debug.Log($"It is Player {TurnManager.GetCurrentPlayerId()}'s turn. It was {callerNetId}'s turn.");
     }
 }

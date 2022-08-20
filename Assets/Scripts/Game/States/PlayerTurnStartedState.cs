@@ -17,7 +17,7 @@ namespace Assets.Scripts.Game.States
             SelectedDominoId = null;
             IsTrackDominoSelected = false;
 
-            //gameStateContext.GameplayManager.OnEventRaised.AddListener(SelectDomino);
+            gameStateContext.GameplayManager.DominoClicked?.OnEventRaised.AddListener(SelectDomino);
         }
 
         public override void UpdateState(GameStateContext gameStateContext)
@@ -26,6 +26,11 @@ namespace Assets.Scripts.Game.States
             {
                 return;
             }
+
+            // TODO: ensure the clicked domino is the player's (rather than a table domino)
+            gameStateContext.Player.CmdSelectDomino(SelectedDominoId.Value);
+
+            gameStateContext.SwitchState(gameStateContext.PlayerSelectedPlayerDominoState);
 
             //var playerSelectedDominoID = gameStateContext.GameplayManager.GetSelectedDominoID();
             //if (!playerSelectedDominoID.HasValue)
@@ -39,10 +44,10 @@ namespace Assets.Scripts.Game.States
 
         public override void LeaveState(GameStateContext gameStateContext)
         {
-            //gameStateContext.GameplayManager.DominoSelected.OnEventRaised.RemoveListener(SelectDomino);
+            gameStateContext.GameplayManager.DominoClicked?.OnEventRaised.RemoveListener(SelectDomino);
         }
 
-        public void SelectDomino(int dominoId)
+        private void SelectDomino(int dominoId)
         {
             SelectedDominoId = dominoId;
         }

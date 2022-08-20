@@ -8,6 +8,7 @@ namespace Assets.Scripts.Game
 {
     public class DominoTracker
     {
+        public int? SelectedDomino { get; private set; }
         public Dictionary<int, DominoInfo> AllDominoes = new Dictionary<int, DominoInfo>();
 
         private List<int> availableDominoes = new List<int>();
@@ -43,6 +44,11 @@ namespace Assets.Scripts.Game
         public DominoInfo GetDominoByID(int id)
         {
             return AllDominoes[id];
+        }
+
+        public void SetSelectedDomino(int dominoId)
+        {
+            SelectedDomino = dominoId;
         }
 
         public DominoInfo GetDominoFromBonePile()

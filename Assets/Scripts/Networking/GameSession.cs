@@ -12,6 +12,7 @@ public class GameSession : NetworkBehaviour
     public LayoutManager Layout = null;
     public TurnManager TurnManager = null;
     public MeshManager MeshManager = null;
+    public GameplayManager GameplayManager = null;
 
     private bool gameStarted = false;
 
@@ -19,15 +20,13 @@ public class GameSession : NetworkBehaviour
     private List<int> availableDominoes = new List<int>();
 
     private GameStateContext gameState;
-    private DominoTracker DominoTracker = new DominoTracker();
-
 
 
     private void Start()
     {
         if (isServer)
         {
-            DominoTracker.CreateDominoSet();
+            GameplayManager.DominoTracker.CreateDominoSet();
             CreateAndPlaceNextEngine();
         }
     }
@@ -37,7 +36,9 @@ public class GameSession : NetworkBehaviour
         if (!gameStarted)
         {
             gameStarted = true;
-            gameState = new GameStateContext(NetworkClient.connection.identity.GetComponent<DominoPlayer>());
+            gameState = new GameStateContext(
+                NetworkClient.connection.identity.GetComponent<DominoPlayer>(),
+                GameplayManager);
         }
 
         gameState.Update();
@@ -78,15 +79,14 @@ public class GameSession : NetworkBehaviour
     [Server]
     public GameObject GetNewPlayerDomino()
     {
-        var dominoInfo = DominoTracker.GetDominoFromBonePile();
+        var dominoInfo = GameplayManager.DominoTracker.GetDominoFromBonePile();
         return MeshManager.GetPlayerDomino(MeshManager.PlayerDominoPrefab, dominoInfo, Layout.PlayerBottomCenter);
     }
 
     [Server]
     public GameObject GetNewEngineDomino()
     {
-        var dominoInfo = DominoTracker.GetNextEngine();
-
+        var dominoInfo = GameplayManager.DominoTracker.GetNextEngine();
         return MeshManager.GetEngineDomino(MeshManager.TableDominoPrefab, dominoInfo, Vector3.zero);
     }
 

@@ -6,7 +6,7 @@ using UnityEngine;
 public class InputManager : NetworkBehaviour
 {
     public Camera MainCamera;
-    public SelectionEvent BottomObjectClicked;
+    public SelectionEvent DominoClicked;
     //public SelectionEvent TrackAdded;
     //public SelectionEvent TrackSelected;
 
@@ -48,13 +48,6 @@ public class InputManager : NetworkBehaviour
     {
         Debug.Log($"Domino {id} ({purpose}) was clicked via InputManager");
 
-        //BottomObjectClicked.RaiseEvent(id);
-        NetworkIdentity identity = NetworkClient.connection.identity;
-        var dominoPlayer = identity.GetComponent<DominoPlayer>();
-
-        dominoPlayer.CmdSelectDomino(id);
-
-        // TODO: figure out how events work
-
+        DominoClicked.RaiseEvent(id);
     }
 }

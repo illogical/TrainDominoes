@@ -9,57 +9,38 @@ using UnityEngine;
 // TODO: make this a singleton for convenience?
 public class GameSession : NetworkBehaviour
 {
-    private int dominoCount = 12;
-    private bool gameStarted = false;
-
     public LayoutManager Layout = null;
     public TurnManager TurnManager = null;
     public MeshManager MeshManager = null;
 
-    [Space]
-    public SelectionEvent PlayerDominoSelected;
-
-    private DominoTracker DominoTracker = new DominoTracker();
+    private bool gameStarted = false;
 
     private Dictionary<int, DominoInfo> dominoData = new Dictionary<int, DominoInfo>();
     private List<int> availableDominoes = new List<int>();
 
-    private GameStateContext gameState = new GameStateContext();
+    private GameStateContext gameState;
+    private DominoTracker DominoTracker = new DominoTracker();
 
 
 
     private void Start()
     {
-        //PlayerDominoSelected?.OnEventRaised.AddListener(HandlePlayerDominoClicked);
-
         if (isServer)
         {
-            StartGame();
+            DominoTracker.CreateDominoSet();
             CreateAndPlaceNextEngine();
         }
     }
 
     private void Update()
     {
-        if(!gameStarted)
+        if (!gameStarted)
         {
-            gameStarted = true;            
-            DealPlayerDominoes(); // TODO: move this to GameStartedState
+            gameStarted = true;
+            gameState = new GameStateContext(NetworkClient.connection.identity.GetComponent<DominoPlayer>());
         }
 
         gameState.Update();
-    }
-
-    private void OnDestroy()
-    {
-        //PlayerDominoSelected?.OnEventRaised.RemoveListener(HandlePlayerDominoClicked);
-    }
-
-
-    private void DealPlayerDominoes()
-    {
-        // runs per player
-        GetPlayer().CmdDealDominoes(dominoCount);   // TODO: dominoCount needs to be dynamic depending upon player count
     }
 
     public GameObject GetDominoById(int id)
@@ -74,12 +55,6 @@ public class GameSession : NetworkBehaviour
         base.OnStartServer();
 
         DontDestroyOnLoad(gameObject);
-    }
-
-    [Server]
-    private void StartGame()
-    {
-        DominoTracker.CreateDominoSet();
     }
 
     [Server]
@@ -184,8 +159,8 @@ public class GameSession : NetworkBehaviour
             {
                 Layout.SetHeaderText($"It is NOT your turn");
             }
-        } 
-        
+        }
+
         if (updateAll)
         {
             if (!isLocalTurn)        // TODO: this works for 2 player but would not for more. How do we know who this client is? Instead maybe subscribe to an event in DominoPlayer so this runs for each player?
@@ -213,11 +188,5 @@ public class GameSession : NetworkBehaviour
     }
 
     #endregion Client
-
-    private DominoPlayer GetPlayer()
-    {
-        NetworkIdentity identity = NetworkClient.connection.identity;
-        return identity.GetComponent<DominoPlayer>();
-    }
 
 }

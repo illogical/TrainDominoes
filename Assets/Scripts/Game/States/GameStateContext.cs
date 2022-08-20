@@ -3,14 +3,18 @@
     public class GameStateContext
     {
         // events that could happen during any state
-        public SelectionEvent DominoSelected;
         public GameStartedState GameStartedState = new GameStartedState();
         public PlayerTurnStartedState PlayerTurnStartedState = new PlayerTurnStartedState();
 
+        public DominoPlayer Player { get; private set; }
+
         private GameStateBase currentState;
 
-        public GameStateContext()
+
+        public GameStateContext(DominoPlayer player)
         {
+            Player = player;
+
             currentState = GameStartedState;
 
             currentState.EnterState(this);
@@ -33,6 +37,5 @@
             currentState = state;
             state.EnterState(this);
         }
-
     }
 }

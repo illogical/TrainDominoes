@@ -6,8 +6,9 @@ namespace Assets.Scripts.Game.States
     {
         public override void EnterState(GameStateContext gameStateContext)
         {
-            //gameStateContext.GameplayManager.BeginGame();
             Debug.Log("STATE: PlayerTurnStartedState");
+
+            gameStateContext.Player.CmdDealDominoes(12);    // TODO: wondering if GameplayManager should contain the logic for determining how many dominoes to deal to each player
         }
 
         public override void UpdateState(GameStateContext gameStateContext)

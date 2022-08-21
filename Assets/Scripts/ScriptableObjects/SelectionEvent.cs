@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-[CreateAssetMenu(menuName = "Events/Selection Event", fileName = "New Selection Event")]
+[CreateAssetMenu(menuName = "Events/Selection Event", fileName = "NewSelectionEvent")]
 public class SelectionEvent : ScriptableObject
 {
     public UnityEvent<int> OnEventRaised;

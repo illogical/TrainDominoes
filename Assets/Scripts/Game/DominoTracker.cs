@@ -45,7 +45,7 @@ namespace Assets.Scripts.Game
         }
 
         public DominoInfo GetDominoByID(int dominoId) => AllDominoes[dominoId];
-        public bool IsPlayerDomino(int dominoId) => playerDominoes.Dominoes.ContainsKey(dominoId);
+        public bool IsPlayerDomino(int netId, int dominoId) => playerDominoes.Dominoes[netId].Contains(dominoId);   // TODO: this doesn't work on the client-only
         public bool IsEngine(int dominoId) => engineIndices[engineIndex] == dominoId;
 
 

@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-// TODO: make this a singleton for convenience?
 public class GameSession : NetworkBehaviour
 {
     public GameplayManager GameplayManager = null;
@@ -110,32 +109,7 @@ public class GameSession : NetworkBehaviour
     [Client]
     public void DisplayPlayersTurn(int callerNetId, bool isLocal, bool updateAll)
     {
-        var isLocalTurn = false;
-
-        if (isLocal)
-        {
-            isLocalTurn = true;
-            if (GameplayManager.TurnManager.IsPlayerTurn(callerNetId))
-            {
-                GameplayManager.LayoutManager.SetHeaderText($"It is your turn");
-            }
-            else
-            {
-                GameplayManager.LayoutManager.SetHeaderText($"It is NOT your turn");
-            }
-        }
-
-        if (updateAll)
-        {
-            if (!isLocalTurn)        // TODO: this works for 2 player but would not for more. How do we know who this client is? Instead maybe subscribe to an event in DominoPlayer so this runs for each player?
-            {
-                GameplayManager.LayoutManager.SetHeaderText($"It is your turn");
-            }
-            else
-            {
-                GameplayManager.LayoutManager.SetHeaderText($"It is NOT your turn");
-            }
-        }
+        GameplayManager.LayoutManager.DisplayPlayersTurn(GameplayManager.TurnManager.IsPlayerTurn(callerNetId), isLocal, updateAll);
     }
 
     [TargetRpc]

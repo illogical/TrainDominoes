@@ -109,6 +109,36 @@ namespace Assets.Scripts.Game
             }
         }
 
+        public void DisplayPlayersTurn(bool isPlayerTurn, bool isLocal, bool updateAll)
+        {
+            var isLocalTurn = false;
+
+            if (isLocal)
+            {
+                isLocalTurn = true;
+                if (isPlayerTurn)
+                {
+                    SetHeaderText($"It is your turn");
+                }
+                else
+                {
+                    SetHeaderText($"It is NOT your turn");
+                }
+            }
+
+            if (updateAll)
+            {
+                if (!isLocalTurn)        // TODO: this works for 2 player but would not for more. How do we know who this client is? Instead maybe subscribe to an event in DominoPlayer so this runs for each player?
+                {
+                    SetHeaderText($"It is your turn");
+                }
+                else
+                {
+                    SetHeaderText($"It is NOT your turn");
+                }
+            }
+        }
+
         //IEnumerator SlideStaggeredToYPosition(List<GameObject> gameObjects, float destinationYPosition, Action afterComplete = null)
         //{
         //    float animationDuration = 0.8f;

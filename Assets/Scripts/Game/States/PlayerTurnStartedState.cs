@@ -2,6 +2,9 @@
 
 namespace Assets.Scripts.Game.States
 {
+    /// <summary>
+    /// The player's turn just began. A domino has not been selected yet.
+    /// </summary>
     public class PlayerTurnStartedState : GameStateBase
     {
         public int? SelectedDominoId;
@@ -9,50 +12,41 @@ namespace Assets.Scripts.Game.States
 
         // TODO: how do we know if this player has a track yet?
 
-        public override void EnterState(GameStateContext gameStateContext)
+        public override string Name => nameof(PlayerTurnStartedState);
+        public override void EnterState(GameStateContext ctx)
         {
-            // add player dominoes
-            Debug.Log("STATE: PlayerTurnStartedState");
-
             SelectedDominoId = null;
             IsTrackDominoSelected = false;
 
-            gameStateContext.GameplayManager.DominoClicked?.OnEventRaised.AddListener(SelectDomino);
+            ctx.GameplayManager.PlayerDominoSelected?.OnEventRaised.AddListener(SelectPlayerDomino);
         }
 
-        public override void UpdateState(GameStateContext gameStateContext)
+        public override void UpdateState(GameStateContext ctx)
         {
             if (!SelectedDominoId.HasValue)
             {
                 return;
             }
 
-            gameStateContext.GameplayManager.DominoTracker.SetSelectedDomino(SelectedDominoId.Value);
+            ctx.GameplayManager.DominoTracker.SetSelectedDomino(SelectedDominoId.Value);
 
             // TODO: ensure the clicked domino is the player's (rather than a table domino)
-            gameStateContext.Player.CmdSelectDomino(SelectedDominoId.Value, null);
+            ctx.Player.CmdSelectPlayerDomino(SelectedDominoId.Value, null);
 
-            gameStateContext.SwitchState(gameStateContext.PlayerSelectedPlayerDominoState);
+            ctx.SwitchState(ctx.PlayerSelectedPlayerDominoState);
 
-            //var playerSelectedDominoID = gameStateContext.GameplayManager.GetSelectedDominoID();
-            //if (!playerSelectedDominoID.HasValue)
-            //{
-            //    gameStateContext.GameplayManager.SelectDomino(SelectedDominoId.Value);
-            //    gameStateContext.SwitchState(gameStateContext.PlayerSelectedPlayerDominoState);
-            //    return;
-            //}
-
+          
         }
 
         public override void LeaveState(GameStateContext gameStateContext)
         {
-            gameStateContext.GameplayManager.DominoClicked?.OnEventRaised.RemoveListener(SelectDomino);
+            gameStateContext.GameplayManager.PlayerDominoSelected?.OnEventRaised.RemoveListener(SelectPlayerDomino);
         }
 
-        private void SelectDomino(int dominoId)
+        private void SelectPlayerDomino(int dominoId)
         {
+            Debug.Log($"Domino {dominoId} selected in SelectPlayerDomino");
             SelectedDominoId = dominoId;
         }
-
     }
 }

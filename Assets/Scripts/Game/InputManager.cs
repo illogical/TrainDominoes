@@ -48,6 +48,9 @@ public class InputManager : NetworkBehaviour
     {
         Debug.Log($"Domino {id} ({purpose}) was clicked via InputManager");
 
-        DominoClicked.RaiseEvent(id);
+        NetworkIdentity identity = NetworkClient.connection.identity;
+        var dominoPlayer = identity.GetComponent<DominoPlayer>();
+
+        dominoPlayer.CmdDominoClicked(id);    // let this determine if a client should fire off the PlayerDominoSelected event for the GameStateContext
     }
 }

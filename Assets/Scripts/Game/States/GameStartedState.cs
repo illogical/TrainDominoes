@@ -4,6 +4,8 @@ namespace Assets.Scripts.Game.States
 {
     public class GameStartedState : GameStateBase
     {
+
+        public override string Name => nameof(GameStartedState);
         public override void EnterState(GameStateContext gameStateContext)
         {
             Debug.Log("STATE: PlayerTurnStartedState");

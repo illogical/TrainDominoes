@@ -6,33 +6,35 @@ using UnityEngine;
 
 namespace Assets.Scripts.Game.States
 {
+    /// <summary>
+    /// The player has selected a domino
+    /// </summary>
     public class PlayerSelectedPlayerDominoState : GameStateBase
     {
         private int? NextSelectedDomino; // player, engine, or track domino 
 
-        public override void EnterState(GameStateContext gameStateContext)
-        {
-            Debug.Log("Welcome to the PlayerSelectedPlayerDominoState");
 
+        public override string Name => nameof(PlayerSelectedPlayerDominoState);
+        public override void EnterState(GameStateContext ctx)
+        {
             NextSelectedDomino = null; // TODO: check if dominoManager.SelectedPlayerDomino is null
 
-            gameStateContext.GameplayManager.DominoClicked?.OnEventRaised.AddListener(SelectDomino);
+            ctx.GameplayManager.PlayerDominoSelected?.OnEventRaised.AddListener(SelectPlayerDomino);
         }
 
-        public override void UpdateState(GameStateContext gameStateContext)
+        public override void UpdateState(GameStateContext ctx)
         {
             if (!NextSelectedDomino.HasValue)
             {
                 return;
             }
 
-            int? lastSelectedDominoId = gameStateContext.GameplayManager.DominoTracker.SelectedDomino;
-            gameStateContext.GameplayManager.DominoTracker.SetSelectedDomino(NextSelectedDomino.Value);
+            int? lastSelectedDominoId = ctx.GameplayManager.DominoTracker.SelectedDomino;
+            ctx.GameplayManager.DominoTracker.SetSelectedDomino(NextSelectedDomino.Value);
 
             // TODO: ensure the clicked domino is the player's (rather than a table domino)
-            gameStateContext.Player.CmdSelectDomino(NextSelectedDomino.Value, lastSelectedDominoId);
-            NextSelectedDomino = null;
-            gameStateContext.SwitchState(gameStateContext.PlayerSelectedPlayerDominoState); 
+            ctx.Player.CmdSelectPlayerDomino(NextSelectedDomino.Value, lastSelectedDominoId);
+            ctx.SwitchState(ctx.PlayerSelectedPlayerDominoState);
 
 
             //var playerSelectedDominoID = gameStateContext.GameplayManager.GetSelectedDominoID();
@@ -92,10 +94,10 @@ namespace Assets.Scripts.Game.States
 
         public override void LeaveState(GameStateContext gameStateContext)
         {
-            gameStateContext.GameplayManager.DominoClicked?.OnEventRaised.RemoveListener(SelectDomino);
+            gameStateContext.GameplayManager.PlayerDominoSelected?.OnEventRaised.RemoveListener(SelectPlayerDomino);
         }
 
-        public void SelectDomino(int dominoId)
+        private void SelectPlayerDomino(int dominoId)
         {
             NextSelectedDomino = dominoId;
         }

@@ -64,5 +64,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  myDominoes: []
-  PlayerDominoSelected: {fileID: 11400000, guid: eb6e070dec80a7e4c9b6bb90aebc81ea, type: 2}
+  ID: 0
+  PlayerDominoSelected: {fileID: 11400000, guid: 60a56e184a990124ab0fd800f7254581, type: 2}

@@ -3,6 +3,10 @@
     public abstract class GameStateBase
     {
         /// <summary>
+        /// Used for logging state changes
+        /// </summary>
+        public abstract string Name { get; }
+        /// <summary>
         /// Setup current state
         /// </summary>
         /// <param name="gameStateContext"></param>

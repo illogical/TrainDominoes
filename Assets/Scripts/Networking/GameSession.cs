@@ -32,7 +32,10 @@ public class GameSession : NetworkBehaviour
                 GameplayManager);
         }
 
-        gameState.Update();
+        if(isClient)
+        {
+            gameState.Update();
+        }
     }
 
     #region Server
@@ -109,6 +112,7 @@ public class GameSession : NetworkBehaviour
     [Client]
     public void DisplayPlayersTurn(int callerNetId, bool isLocal, bool updateAll)
     {
+        Debug.Log("DisplayPlayersTurn()");
         GameplayManager.LayoutManager.DisplayPlayersTurn(GameplayManager.TurnManager.IsPlayerTurn(callerNetId), isLocal, updateAll);
     }
 

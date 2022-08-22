@@ -1,4 +1,6 @@
-﻿namespace Assets.Scripts.Game.States
+﻿using UnityEngine;
+
+namespace Assets.Scripts.Game.States
 {
     public class GameStateContext
     {
@@ -32,7 +34,15 @@
         {
             currentState.LeaveState(this);
             currentState = state;
+
+            LogStateChanged(state.Name);
+
             state.EnterState(this);
+        }
+
+        public void LogStateChanged(string stateName)
+        {
+            Debug.Log($"<b><color=green>STATE:</color> {stateName}</b>");
         }
     }
 }

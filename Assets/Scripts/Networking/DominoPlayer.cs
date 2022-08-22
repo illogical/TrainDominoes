@@ -90,7 +90,7 @@ public class DominoPlayer : NetworkBehaviour
     }
 
     [Command]
-    public void CmdSelectDomino(int dominoId, int? lastSelectedId)
+    public void CmdSelectPlayerDomino(int dominoId, int? lastSelectedId)
     {
         var gameSession = FindObjectOfType<GameSession>();
         // TODO: check if this is on the table and if so then ignore it. After the state machine is implemented then it would take different action if a domino is selected.
@@ -100,6 +100,27 @@ public class DominoPlayer : NetworkBehaviour
             : null;
 
         gameSession.RpcMoveSelectedDomino(connectionToClient, dominoObject, lastSelectedDomino);
+    }
+
+    [Command]
+    public void CmdDominoClicked(int dominoId)
+    {
+        var gameSession = FindObjectOfType<GameSession>();
+        int netId = (int)connectionToClient.identity.netId;
+        if (!gameSession.GameplayManager.TurnManager.IsPlayerTurn(netId))
+        {
+            Debug.Log("It is not your turn");
+            return;
+        }
+        if(!gameSession.GameplayManager.DominoTracker.IsPlayerDomino(netId, dominoId))
+        {
+            // TODO: check if this is an engine or table domino and fire events for each
+
+            Debug.Log("Choose your domino first");
+            return;
+        }
+
+        RpcRaisePlayerSelectedDomino(connectionToClient, dominoId);
     }
 
     /// <summary>
@@ -151,6 +172,13 @@ public class DominoPlayer : NetworkBehaviour
     {
         var gameSession = FindObjectOfType<GameSession>();
         gameSession.DisplayPlayersTurn(netId, isLocalPlayer, updateAll);
+    }
+
+    [TargetRpc]
+    public void RpcRaisePlayerSelectedDomino(NetworkConnection conn, int dominoId)
+    {
+        var gameSession = FindObjectOfType<GameSession>();
+        gameSession.GameplayManager.PlayerDominoSelected?.RaiseEvent(dominoId);
     }
 
     #endregion Client

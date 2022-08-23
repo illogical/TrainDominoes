@@ -7,11 +7,16 @@ using UnityEngine;
 namespace Assets.Scripts.Game.States
 {
     /// <summary>
-    /// The player has selected a domino
+    /// The player has selected a domino. 
+    /// The player could select a different domino.
+    /// The player could select the engine to attempt to add a new track.
+    /// The player could select any domino on a track to attempt to add the domino to the end of the track.
     /// </summary>
     public class PlayerSelectedPlayerDominoState : GameStateBase
     {
-        private int? NextSelectedDomino; // player, engine, or track domino 
+        public bool DominoSelecting;
+        public int? ClickedDominoId;
+        public int? NextSelectedDomino; // player, engine, or track domino 
 
 
         public override string Name => nameof(PlayerSelectedPlayerDominoState);
@@ -19,11 +24,19 @@ namespace Assets.Scripts.Game.States
         {
             NextSelectedDomino = null; // TODO: check if dominoManager.SelectedPlayerDomino is null
 
+            ctx.GameplayManager.DominoClicked?.OnEventRaised.AddListener(DominoClicked);
             ctx.GameplayManager.PlayerDominoSelected?.OnEventRaised.AddListener(SelectPlayerDomino);
         }
 
         public override void UpdateState(GameStateContext ctx)
         {
+            if (ClickedDominoId.HasValue && DominoSelecting)
+            {
+                ctx.Player.CmdDominoClicked(ClickedDominoId.Value);
+                DominoSelecting = false;
+                return;
+            }
+
             if (!NextSelectedDomino.HasValue)
             {
                 return;
@@ -92,9 +105,16 @@ namespace Assets.Scripts.Game.States
             //}
         }
 
-        public override void LeaveState(GameStateContext gameStateContext)
+        public override void LeaveState(GameStateContext ctx)
         {
-            gameStateContext.GameplayManager.PlayerDominoSelected?.OnEventRaised.RemoveListener(SelectPlayerDomino);
+            ctx.GameplayManager.DominoClicked?.OnEventRaised.RemoveListener(DominoClicked);
+            ctx.GameplayManager.PlayerDominoSelected?.OnEventRaised.RemoveListener(SelectPlayerDomino);
+        }
+
+        private void DominoClicked(int dominoId)
+        {
+            DominoSelecting = true;
+            ClickedDominoId = dominoId;
         }
 
         private void SelectPlayerDomino(int dominoId)

@@ -10,6 +10,7 @@ public class GameplayManager : MonoBehaviour
     public LayoutManager LayoutManager = null;
     public TurnManager TurnManager = null;
     [Header("Events")]
+    public SelectionEvent DominoClicked;
     public SelectionEvent PlayerDominoSelected;
 
     [HideInInspector]

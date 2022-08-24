@@ -103,6 +103,23 @@ public class DominoPlayer : NetworkBehaviour
     }
 
     [Command]
+    public void CmdAddDominoToNewTrack(int selectedDominoId, int engineDominoId)
+    {
+        var gameSession = FindObjectOfType<GameSession>();
+
+        Debug.Log("Pretend a new track was added.");
+
+        // TODO: add logic to check if these dominoes match
+
+    }
+
+    [Command]
+    public void CmdEngineClicked(int selectedDominoId)
+    {
+        RpcRaiseCreateNewTrack(connectionToClient, selectedDominoId);
+    }
+
+    [Command]
     public void CmdDominoClicked(int dominoId)
     {
         var gameSession = FindObjectOfType<GameSession>();
@@ -116,7 +133,7 @@ public class DominoPlayer : NetworkBehaviour
         {
             // TODO: check if this is an engine or table domino and fire events for each
 
-            Debug.Log("Choose your domino first");
+            RpcRaiseSelectEngineDomino(connectionToClient, dominoId);
             return;
         }
 
@@ -179,6 +196,20 @@ public class DominoPlayer : NetworkBehaviour
     {
         var gameSession = FindObjectOfType<GameSession>();
         gameSession.GameplayManager.PlayerDominoSelected?.RaiseEvent(dominoId);
+    }
+
+    [TargetRpc]
+    public void RpcRaiseSelectEngineDomino(NetworkConnection conn, int dominoId)
+    {
+        var gameSession = FindObjectOfType<GameSession>();
+        gameSession.GameplayManager.EngineDominoSelected?.RaiseEvent(dominoId);
+    }
+
+    [TargetRpc]
+    public void RpcRaiseCreateNewTrack(NetworkConnection conn, int dominoId)
+    {
+        var gameSession = FindObjectOfType<GameSession>();
+        gameSession.GameplayManager.CreateTrackWithDomino?.RaiseEvent(dominoId);
     }
 
     #endregion Client

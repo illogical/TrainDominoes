@@ -12,6 +12,8 @@ public class GameplayManager : MonoBehaviour
     [Header("Events")]
     public SelectionEvent DominoClicked;
     public SelectionEvent PlayerDominoSelected;
+    public SelectionEvent EngineDominoSelected;
+    public SelectionEvent CreateTrackWithDomino;
 
     [HideInInspector]
     public DominoTracker DominoTracker = new DominoTracker();

@@ -8,6 +8,7 @@ namespace Assets.Scripts.Game.States
         public GameStartedState GameStartedState = new GameStartedState();
         public PlayerTurnStartedState PlayerTurnStartedState = new PlayerTurnStartedState();
         public PlayerSelectedPlayerDominoState PlayerSelectedPlayerDominoState = new PlayerSelectedPlayerDominoState();
+        public PlayerHasTakenAction PlayerHasTakenAction = new PlayerHasTakenAction();
 
         public DominoPlayer Player { get; private set; }
         public GameplayManager GameplayManager { get; private set; } 

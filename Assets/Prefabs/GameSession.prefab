@@ -70,8 +70,6 @@ MonoBehaviour:
   syncMode: 1
   syncInterval: 0.1
   GameplayManager: {fileID: 1883398197}
-  DominoClicked: {fileID: 11400000, guid: eb6e070dec80a7e4c9b6bb90aebc81ea, type: 2}
-  PlayerDominoSelected: {fileID: 11400000, guid: 60a56e184a990124ab0fd800f7254581, type: 2}
 --- !u!114 &1442959920
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -184,3 +182,5 @@ MonoBehaviour:
   TurnManager: {fileID: 679130552504588390}
   DominoClicked: {fileID: 11400000, guid: eb6e070dec80a7e4c9b6bb90aebc81ea, type: 2}
   PlayerDominoSelected: {fileID: 11400000, guid: 60a56e184a990124ab0fd800f7254581, type: 2}
+  EngineDominoSelected: {fileID: 11400000, guid: f59f2c8b3cc5c7f42a4c16946d233a9d, type: 2}
+  CreateTrackWithDomino: {fileID: 11400000, guid: c196afd4dea72f849a152d4682b5bb00, type: 2}

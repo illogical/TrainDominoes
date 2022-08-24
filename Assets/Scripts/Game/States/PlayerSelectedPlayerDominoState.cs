@@ -15,6 +15,8 @@ namespace Assets.Scripts.Game.States
     public class PlayerSelectedPlayerDominoState : GameStateBase
     {
         public bool DominoSelecting;
+        public bool EngineDominoSelecting;
+        public bool NewTrackAdding;
         public int? ClickedDominoId;
         public int? NextSelectedDomino; // player, engine, or track domino 
 
@@ -22,10 +24,16 @@ namespace Assets.Scripts.Game.States
         public override string Name => nameof(PlayerSelectedPlayerDominoState);
         public override void EnterState(GameStateContext ctx)
         {
+            DominoSelecting = false;
+            EngineDominoSelecting = false;
+            NewTrackAdding = false;
+
             NextSelectedDomino = null; // TODO: check if dominoManager.SelectedPlayerDomino is null
 
             ctx.GameplayManager.DominoClicked?.OnEventRaised.AddListener(DominoClicked);
             ctx.GameplayManager.PlayerDominoSelected?.OnEventRaised.AddListener(SelectPlayerDomino);
+            ctx.GameplayManager.EngineDominoSelected?.OnEventRaised.AddListener(SelectEngineDomino);
+            ctx.GameplayManager.CreateTrackWithDomino?.OnEventRaised.AddListener(AddDominoToTrack);
         }
 
         public override void UpdateState(GameStateContext ctx)
@@ -42,11 +50,35 @@ namespace Assets.Scripts.Game.States
                 return;
             }
 
-            int? lastSelectedDominoId = ctx.GameplayManager.DominoTracker.SelectedDomino;
+            int? previouslySelectedDominoId = ctx.GameplayManager.DominoTracker.SelectedDomino;
+
+            if (NewTrackAdding)
+            {
+                ctx.Player.CmdAddDominoToNewTrack(previouslySelectedDominoId.Value, NextSelectedDomino.Value);
+                NewTrackAdding = false;
+                // the player can end their turn
+                ctx.SwitchState(ctx.PlayerHasTakenAction);
+                return;
+            }
+
+            if (previouslySelectedDominoId.HasValue && EngineDominoSelecting)
+            {
+                ctx.Player.CmdEngineClicked(previouslySelectedDominoId.Value);
+                EngineDominoSelecting = false;
+                return;
+            }
+            else if(EngineDominoSelecting) // player clicked a domino that was not in hand
+            {
+                Debug.Log("Choose your domino first");
+                EngineDominoSelecting = false;
+                return;
+            }
+
+            
             ctx.GameplayManager.DominoTracker.SetSelectedDomino(NextSelectedDomino.Value);
 
             // TODO: ensure the clicked domino is the player's (rather than a table domino)
-            ctx.Player.CmdSelectPlayerDomino(NextSelectedDomino.Value, lastSelectedDominoId);
+            ctx.Player.CmdSelectPlayerDomino(NextSelectedDomino.Value, previouslySelectedDominoId);
             ctx.SwitchState(ctx.PlayerSelectedPlayerDominoState);
 
 
@@ -109,6 +141,8 @@ namespace Assets.Scripts.Game.States
         {
             ctx.GameplayManager.DominoClicked?.OnEventRaised.RemoveListener(DominoClicked);
             ctx.GameplayManager.PlayerDominoSelected?.OnEventRaised.RemoveListener(SelectPlayerDomino);
+            ctx.GameplayManager.EngineDominoSelected?.OnEventRaised.RemoveListener(SelectEngineDomino);
+            ctx.GameplayManager.CreateTrackWithDomino?.OnEventRaised.RemoveListener(AddDominoToTrack);
         }
 
         private void DominoClicked(int dominoId)
@@ -120,6 +154,17 @@ namespace Assets.Scripts.Game.States
         private void SelectPlayerDomino(int dominoId)
         {
             NextSelectedDomino = dominoId;
+        }
+
+        private void SelectEngineDomino(int dominoId)
+        {
+            EngineDominoSelecting = true;
+            NextSelectedDomino = dominoId;
+        }
+
+        private void AddDominoToTrack(int dominoId)
+        {
+            NewTrackAdding = true;
         }
     }
 }

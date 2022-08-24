@@ -2,6 +2,13 @@
 {
     public abstract class GameStateBase
     {
+        protected GameStateContext ctx;
+
+        public GameStateBase(GameStateContext gameContext)
+        {
+            ctx = gameContext;
+        }
+
         /// <summary>
         /// Used for logging state changes
         /// </summary>
@@ -10,16 +17,16 @@
         /// Setup current state
         /// </summary>
         /// <param name="gameStateContext"></param>
-        public abstract void EnterState(GameStateContext gameStateContext);
+        public abstract void EnterState();
         /// <summary>
         /// Main game loop during this state
         /// </summary>
         /// <param name="gameStateContext"></param>
-        public abstract void UpdateState(GameStateContext gameStateContext);
+        public abstract void UpdateState();
         /// <summary>
         /// Cleanup before switching to the next state
         /// </summary>
         /// <param name="gameStateContext"></param>
-        public abstract void LeaveState(GameStateContext gameStateContext);
+        public abstract void LeaveState();
     }
 }

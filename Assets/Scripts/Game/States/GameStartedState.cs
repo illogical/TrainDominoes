@@ -4,21 +4,20 @@ namespace Assets.Scripts.Game.States
 {
     public class GameStartedState : GameStateBase
     {
+        public GameStartedState(GameStateContext gameContext) : base(gameContext) { }
 
         public override string Name => nameof(GameStartedState);
-        public override void EnterState(GameStateContext gameStateContext)
+        public override void EnterState()
         {
-            Debug.Log("STATE: PlayerTurnStartedState");
-
-            gameStateContext.Player.CmdDealDominoes(12);    // TODO: wondering if GameplayManager should contain the logic for determining how many dominoes to deal to each player
+            ctx.Player.CmdDealDominoes(12);    // TODO: wondering if GameplayManager should contain the logic for determining how many dominoes to deal to each player
         }
 
-        public override void UpdateState(GameStateContext gameStateContext)
+        public override void UpdateState()
         {
-            gameStateContext.SwitchState(gameStateContext.PlayerTurnStartedState);
+            ctx.SwitchState(ctx.PlayerTurnStartedState);
         }
 
-        public override void LeaveState(GameStateContext gameStateContext)
+        public override void LeaveState()
         {
 
         }

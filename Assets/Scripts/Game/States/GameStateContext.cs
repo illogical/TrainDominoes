@@ -5,10 +5,10 @@ namespace Assets.Scripts.Game.States
     public class GameStateContext
     {
         // events that could happen during any state
-        public GameStartedState GameStartedState = new GameStartedState();
-        public PlayerTurnStartedState PlayerTurnStartedState = new PlayerTurnStartedState();
-        public PlayerSelectedPlayerDominoState PlayerSelectedPlayerDominoState = new PlayerSelectedPlayerDominoState();
-        public PlayerHasTakenAction PlayerHasTakenAction = new PlayerHasTakenAction();
+        public GameStartedState GameStartedState;
+        public PlayerTurnStartedState PlayerTurnStartedState;
+        public PlayerSelectedPlayerDominoState PlayerSelectedPlayerDominoState;
+        public PlayerHasTakenAction PlayerHasTakenAction;
 
         public DominoPlayer Player { get; private set; }
         public GameplayManager GameplayManager { get; private set; } 
@@ -18,27 +18,32 @@ namespace Assets.Scripts.Game.States
 
         public GameStateContext(DominoPlayer player, GameplayManager gameplayManager)
         {
-            Player = player;
-
-            currentState = GameStartedState;
+            Player = player;            
             GameplayManager = gameplayManager;
 
-            currentState.EnterState(this);
+            GameStartedState = new GameStartedState(this);
+            PlayerTurnStartedState = new PlayerTurnStartedState(this);
+            PlayerSelectedPlayerDominoState = new PlayerSelectedPlayerDominoState(this);
+            PlayerHasTakenAction = new PlayerHasTakenAction(this);
+
+            currentState = GameStartedState;
+
+            currentState.EnterState();
         }
 
         public void Update()
         {
-            currentState.UpdateState(this);
+            currentState.UpdateState();
         }
 
         public void SwitchState(GameStateBase state)
         {
-            currentState.LeaveState(this);
+            currentState.LeaveState();
             currentState = state;
 
             LogStateChanged(state.Name);
 
-            state.EnterState(this);
+            state.EnterState();
         }
 
         public void LogStateChanged(string stateName)

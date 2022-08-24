@@ -2,6 +2,7 @@ using Assets.Scripts.Models;
 using Mirror;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 
@@ -129,6 +130,7 @@ public class DominoPlayer : NetworkBehaviour
             Debug.Log("It is not your turn");
             return;
         }
+
         if(!gameSession.GameplayManager.DominoTracker.IsPlayerDomino(netId, dominoId))
         {
             // TODO: check if this is an engine or table domino and fire events for each
@@ -147,25 +149,20 @@ public class DominoPlayer : NetworkBehaviour
     [Command]
     public void CmdDealDominoes(int dominoCount)
     {
-        // TODO: move this logic into MeshManager (except for the Rpc call)
         var gameSession = FindObjectOfType<GameSession>();
         var newDominoes = gameSession.DealNewDominoes(dominoCount);
 
         if(connectionToClient != null)
         {
-            var dominoIds = new List<int>();
-            foreach(var dom in newDominoes)
-            {
-                dominoIds.Add(dom.GetComponent<DominoEntity>().ID);
-            }
-
             // store IDs of the dominoes that this player has in their hand
             int netId = (int)connectionToClient.identity.netId;
-            gameSession.GameplayManager.DominoTracker.AddPlayerDominoes(netId, dominoIds);
+            gameSession.GameplayManager.DominoTracker.AddPlayerDominoes(
+                netId, 
+                newDominoes.Select(d => d.GetComponent<DominoEntity>().ID).ToList());
+
             RpcSetPlayerTurnText(netId, false);
         }
 
-        // TODO: can this only run on the the local player? isLocalPlayer causes client to not line up any dominoes for themselves
         RpcSetPlayerDominoPositions(newDominoes);   
     }
 

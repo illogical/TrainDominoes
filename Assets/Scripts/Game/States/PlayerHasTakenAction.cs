@@ -8,19 +8,21 @@ namespace Assets.Scripts.Game.States
 {
     public class PlayerHasTakenAction : GameStateBase
     {
+        public PlayerHasTakenAction(GameStateContext gameContext) : base(gameContext) { }
+
         public override string Name => nameof(PlayerHasTakenAction);
 
-        public override void EnterState(GameStateContext gameStateContext)
+        public override void EnterState()
         {
             
         }
 
-        public override void LeaveState(GameStateContext gameStateContext)
+        public override void LeaveState()
         {
             
         }
 
-        public override void UpdateState(GameStateContext gameStateContext)
+        public override void UpdateState()
         {
             
         }

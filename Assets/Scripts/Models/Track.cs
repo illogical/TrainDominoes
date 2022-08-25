@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 namespace Assets.Scripts.Models
 {
@@ -9,6 +10,7 @@ namespace Assets.Scripts.Models
         public int? PlayerId { get; set; }  // each player gets only 1 track. When null then anyone can use this track
         public bool HasTrain { get; set; }  // TODO: needs set to true when a player is unable to play a domino
         public List<int> DominoIds { get; set; }
+        public Vector3 StartPosition { get; set; } // position of the left-most domino
 
         public Track(int dominoId, int? owner = null)
         {

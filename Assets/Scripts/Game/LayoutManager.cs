@@ -19,7 +19,6 @@ namespace Assets.Scripts.Game
         public AnimationDefinition EngineSlideIn;
         public AnimationDefinition DominoSelection;
         public AnimationDefinition DominoDeselection;
-        public AnimationCurve test;
         [Space]
         public Vector3 PlayerTopCenter = new Vector3(0, 0.08f, 0);
         public Vector3 PlayerBottomCenter = new Vector3(0, -0.08f, 0);

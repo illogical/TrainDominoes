@@ -14,9 +14,6 @@ namespace Assets.Scripts.Game.States
     /// </summary>
     public class PlayerSelectedPlayerDominoState : GameStateBase
     {
-        public bool DominoSelecting;
-        public bool EngineDominoSelecting;
-        public bool NewTrackAdding;
         public int? ClickedDominoId;
         public int? NextSelectedDomino; // player, engine, or track domino 
 
@@ -25,10 +22,6 @@ namespace Assets.Scripts.Game.States
         public override string Name => nameof(PlayerSelectedPlayerDominoState);
         public override void EnterState()
         {
-            DominoSelecting = false;
-            EngineDominoSelecting = false;
-            NewTrackAdding = false;
-
             NextSelectedDomino = null;
 
             ctx.GameplayManager.DominoClicked?.OnEventRaised.AddListener(DominoClicked);
@@ -39,8 +32,6 @@ namespace Assets.Scripts.Game.States
 
         public override void UpdateState()
         {
-
-
             //if (gameStateContext.GameplayManager.IsEngineDomino(NextSelectedDomino.Value) && gameStateContext.GameplayManager.CompareDominoes(playerSelectedDominoID.Value, NextSelectedDomino.Value))
             //{
             //    // player clicked the engine domino with a match
@@ -51,13 +42,6 @@ namespace Assets.Scripts.Game.States
             //    gameStateContext.GameplayManager.AddDominoToNewTrack(playerSelectedDomino.ID);
 
             //    gameStateContext.SwitchState(gameStateContext.IdlePlayerModifiedTrackState);
-            //    return;
-            //}
-
-            //var trackIndex = gameStateContext.GameplayManager.GetTrackIndexByDominoId(NextSelectedDomino.Value);
-            //if (!trackIndex.HasValue)
-            //{
-            //    // not a domino from a track
             //    return;
             //}
 
@@ -107,7 +91,6 @@ namespace Assets.Scripts.Game.States
         private void AddDominoToTrack(int dominoId)
         {
             ctx.Player.CmdAddDominoToNewTrack(ctx.GameplayManager.DominoTracker.SelectedDomino.Value, NextSelectedDomino.Value);
-            NewTrackAdding = false;
             // the player can end their turn
             ctx.SwitchState(ctx.PlayerHasTakenAction);
         }

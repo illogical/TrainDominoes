@@ -36,7 +36,6 @@ namespace Assets.Scripts.Game.States
 
         private void SelectPlayerDomino(int dominoId)
         {
-            Debug.Log($"Domino {dominoId} selected in SelectPlayerDomino");
             SelectedPlayerDominoId = dominoId;
 
             ctx.GameplayManager.DominoTracker.SetSelectedDomino(SelectedPlayerDominoId.Value);

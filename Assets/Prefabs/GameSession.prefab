@@ -89,30 +89,8 @@ MonoBehaviour:
   EngineSlideIn: {fileID: 11400000, guid: 026a97c894704b64d8a932d1ed418e2e, type: 2}
   DominoSelection: {fileID: 11400000, guid: fb803e31b9b94c0478a20b8c74b121fc, type: 2}
   DominoDeselection: {fileID: 11400000, guid: 9713d809b46f21d458d3aa2ec11af66b, type: 2}
-  test:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
+  DominoSlideToTrack: {fileID: 11400000, guid: f49b9a80782d8494d95524ca43fb7ad6, type: 2}
+  DominoRotateToTrack: {fileID: 11400000, guid: 2117bd44086a51045acc9c94054810e5, type: 2}
   PlayerTopCenter: {x: 0, y: 0.08, z: 0}
   PlayerBottomCenter: {x: 0, y: -0.08, z: 0}
   TablePosition: {x: 0, y: 0, z: 0}

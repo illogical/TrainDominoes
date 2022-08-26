@@ -90,7 +90,7 @@ namespace Assets.Scripts.Game.States
 
         private void AddDominoToTrack(int dominoId)
         {
-            ctx.Player.CmdAddDominoToNewTrack(ctx.GameplayManager.DominoTracker.SelectedDomino.Value, NextSelectedDomino.Value);
+            ctx.Player.CmdAddDominoToNewTrack(ctx.GameplayManager.DominoTracker.SelectedDomino.Value, dominoId);
             // the player can end their turn
             ctx.SwitchState(ctx.PlayerHasTakenAction);
         }

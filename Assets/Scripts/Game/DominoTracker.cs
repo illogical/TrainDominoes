@@ -11,12 +11,12 @@ namespace Assets.Scripts.Game
         public int? SelectedDomino { get; private set; }
         public Dictionary<int, DominoInfo> AllDominoes = new Dictionary<int, DominoInfo>();
         // TODO: begin tracking tracks
-        private Station station;
+        public Station Station { get; private set; }
 
         private PlayerDominoes playerDominoes = new PlayerDominoes();
         private List<int> availableDominoes = new List<int>();
         private List<int> engineIndices = new List<int>();
-        private int engineIndex = 0;
+        private int engineIndex = -1;
 
         private const int maxDots = 12;
 
@@ -45,6 +45,7 @@ namespace Assets.Scripts.Game
         }
 
         public DominoInfo GetDominoByID(int dominoId) => AllDominoes[dominoId];
+        public int GetEngineDominoID() => engineIndices[engineIndex];
         public bool IsPlayerDomino(int netId, int dominoId) => playerDominoes.Dominoes[netId].Contains(dominoId);   // TODO: this doesn't work on the client-only
         public bool IsEngine(int dominoId) => engineIndices[engineIndex] == dominoId;
 
@@ -76,13 +77,18 @@ namespace Assets.Scripts.Game
 
         public DominoInfo GetNextEngineAndCreateStation()
         {
-            var engine = AllDominoes[engineIndices[engineIndex++]];
+            var engine = AllDominoes[engineIndices[++engineIndex]];
             availableDominoes.Remove(engine.ID);    // no longer available to pick up
 
-            station = new Station(engine);
+            Station = new Station(engine);
 
             return engine;
         }
+
+        //public Track AddToNewTrack(int dominoId) => station.AddTrack(dominoId);
+
+        //public Track AddToTrack(int dominoId, int trackIndex) => station.AddDominoToTrack(dominoId, trackIndex);
+
 
         private DominoInfo createDomino(int topScore, int bottomScore, int index)
         {

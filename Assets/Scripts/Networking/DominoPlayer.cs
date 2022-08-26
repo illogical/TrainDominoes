@@ -107,10 +107,7 @@ public class DominoPlayer : NetworkBehaviour
     public void CmdAddDominoToNewTrack(int selectedDominoId, int engineDominoId)
     {
         var gameSession = FindObjectOfType<GameSession>();
-
-        Debug.Log("Pretend a new track was added.");
-
-        // TODO: add logic to check if these dominoes match
+        gameSession.GameplayManager.AddSelectedToNewTrack(selectedDominoId);
 
     }
 

@@ -9,10 +9,8 @@ namespace Assets.Scripts.Game
 {
     public class MeshManager : MonoBehaviour
     {
-        // TODO: move to MeshManager
         public GameObject PlayerDominoPrefab = null;
         public GameObject TableDominoPrefab = null;
-
         
         private Dictionary<int, GameObject> dominoObjects = new Dictionary<int, GameObject>();   // TODO: now both clients know about each other's dominoes. Feels unsure.
         private Quaternion dominoRotation = Quaternion.Euler(new Vector3(-90, 0, 180));
@@ -30,7 +28,9 @@ namespace Assets.Scripts.Game
             return engineDomino;
         }
 
-        public GameObject GetEngineDomino(GameObject prefab, DominoInfo info, Vector3 position)
+        public GameObject GetEngineDomino() => engineDomino;
+
+        public GameObject CreateEngineDomino(GameObject prefab, DominoInfo info, Vector3 position)
         {
             engineDomino = CreateDominoFromInfo(prefab, info, position, PurposeType.Engine);
             return engineDomino;

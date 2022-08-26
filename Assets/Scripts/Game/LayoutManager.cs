@@ -19,6 +19,8 @@ namespace Assets.Scripts.Game
         public AnimationDefinition EngineSlideIn;
         public AnimationDefinition DominoSelection;
         public AnimationDefinition DominoDeselection;
+        public AnimationDefinition DominoSlideToTrack;
+        public AnimationDefinition DominoRotateToTrack;
         [Space]
         public Vector3 PlayerTopCenter = new Vector3(0, 0.08f, 0);
         public Vector3 PlayerBottomCenter = new Vector3(0, -0.08f, 0);
@@ -70,6 +72,18 @@ namespace Assets.Scripts.Game
         {
             var objectSize = PositionHelper.GetObjectDimensions(engine);
             return PositionHelper.GetScreenLeftCenterPositionForObject(objectSize, MainCamera, 0);
+        }
+
+        public void PlaceDominoOnTrack(GameObject domino, Vector3 enginePosition, int trackDominoIndex, Action afterComplete = null)
+        {
+            var mover = domino.GetComponent<Mover>();
+
+            var destination = enginePosition + new Vector3(0.05f, 0, 0);
+
+            // TODO: Move up to track y position then move over to the X
+            // TODO: even better, spring past the x position and come back for a little sample of juice
+            StartCoroutine(mover.RotateOverSeconds(Quaternion.Euler(0, 90, 90), DominoRotateToTrack));
+            StartCoroutine(mover.MoveOverSeconds(destination, DominoSlideToTrack, afterComplete));   // TODO: new animation definition for adding domino to track
         }
 
         public void SelectDomino(GameObject domino)

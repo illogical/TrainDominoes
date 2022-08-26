@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class Mover : MonoBehaviour
 {
-    public IEnumerator MoveOverSeconds(Vector3 endPos, AnimationDefinition animationDefinition, Action afterComplete = null)
+    public IEnumerator MoveOverSeconds(Vector3 destination, AnimationDefinition animationDefinition, Action afterComplete = null)
     {
         if (animationDefinition.Delay > 0)
         {
@@ -17,11 +17,11 @@ public class Mover : MonoBehaviour
         var startPos = transform.position;
         while (elapsedTime < animationDefinition.Duration)
         {
-            transform.position = Vector3.Lerp(startPos, endPos, animationDefinition.Curve.Evaluate(elapsedTime / animationDefinition.Duration));
+            transform.position = Vector3.Lerp(startPos, destination, animationDefinition.Curve.Evaluate(elapsedTime / animationDefinition.Duration));
             elapsedTime += Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
-        transform.position = endPos;
+        transform.position = destination;
 
         if (afterComplete != null)
         {
@@ -50,6 +50,21 @@ public class Mover : MonoBehaviour
         {
             afterComplete();
         }
+    }
+
+    public IEnumerator RotateOverSeconds(Quaternion rotationAmount, AnimationDefinition animationDefinition)
+    {
+        yield return new WaitForSeconds(animationDefinition.Delay);
+
+        float elapsedTime = 0;
+        var startRotation = transform.rotation;
+        while (elapsedTime < animationDefinition.Duration)
+        {
+            transform.rotation = Quaternion.Lerp(startRotation, rotationAmount, animationDefinition.Curve.Evaluate(elapsedTime / animationDefinition.Duration));
+            elapsedTime += Time.deltaTime;
+            yield return new WaitForEndOfFrame();
+        }
+        transform.rotation = rotationAmount;
     }
 
     public IEnumerator RotateOverSeconds(Quaternion rotationAmount, float seconds, AnimationCurve animationCurve, float delay)

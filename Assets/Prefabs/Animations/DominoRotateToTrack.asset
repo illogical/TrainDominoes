@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ae1d002c6a924bf4191e09fa3d19e2f3, type: 3}
-  m_Name: PlayerDominoSlideIn
-  m_EditorClassIdentifier: Assembly-CSharp:Assets.Scripts.ScriptableObjects:AnimationDefinition
-  Duration: 0.5
-  Delay: 0.025
+  m_Name: DominoRotateToTrack
+  m_EditorClassIdentifier: 
+  Duration: 0.3
+  Delay: 0.15
   Curve:
     serializedVersion: 2
     m_Curve:
@@ -29,8 +29,8 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 0
-      outSlope: 0
+      inSlope: 2
+      outSlope: 2
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
